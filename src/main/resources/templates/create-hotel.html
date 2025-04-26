@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Створити готель</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>Створити готель</h1>
+
+<div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+<form th:action="@{/create}" th:object="${hotelDTO}" method="post">
+    <label>ID Користувача:</label>
+    <input type="number" th:field="*{userId}" required/><br/>
+
+
+    <label>Назва:</label>
+    <input type="text" th:field="*{name}" required/><br/>
+
+    <label>Адреса:</label>
+    <input type="text" th:field="*{address}" required/><br/>
+
+    <label>Місто:</label>
+    <input type="text" th:field="*{city}" required/><br/>
+
+    <label>Країна:</label>
+    <input type="text" th:field="*{country}" required/><br/>
+
+    <label>Контактна інформація:</label>
+    <input type="text" th:field="*{contactInfo}" required/><br/>
+
+    <h3>Кімнати</h3>
+    <div id="rooms">
+        <div th:each="room, iStat : *{rooms}">
+            <label>Номер кімнати:</label>
+            <input type="text" th:field="*{rooms[__${iStat.index}__].roomNumber}" required/><br/>
+
+            <label>Тип:</label>
+            <input type="text" th:field="*{rooms[__${iStat.index}__].type}" required/><br/>
+
+            <label>Ціна:</label>
+            <input type="number" step="0.01" th:field="*{rooms[__${iStat.index}__].price}" required/><br/>
+
+            <label>Доступна:</label>
+            <input type="checkbox" th:field="*{rooms[__${iStat.index}__].available}" /><br/>
+
+            <hr/>
+        </div>
+    </div>
+
+    <button type="button" onclick="addRoom()">+ Додати кімнату</button><br/><br/>
+    <button type="submit">Створити</button>
+</form>
+
+<script>
+    let roomIndex = [[${hotelDTO.rooms.size()} ?: 0]];
+    function addRoom() {
+        const roomHtml = `
+        <div>
+            <label>Номер кімнати:</label>
+            <input type="text" name="rooms[${roomIndex}].roomNumber" required/><br/>
+
+            <label>Тип:</label>
+            <input type="text" name="rooms[${roomIndex}].type" required/><br/>
+
+            <label>Ціна:</label>
+            <input type="number" step="0.01" name="rooms[${roomIndex}].price" required/><br/>
+
+            <label>Доступна:</label>
+            <input type="checkbox" name="rooms[${roomIndex}].available"/><br/>
+            <hr/>
+        </div>`;
+        $("#rooms").append(roomHtml);
+        roomIndex++;
+    }
+</script>
+
+</body>
+</html>

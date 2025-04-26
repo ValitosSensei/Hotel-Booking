@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form th:action="@{/admin/editHotel/{hotelId}(hotelId=${hotel.id})}" th:object="${hotel}" method="post">
+    <input type="text" th:field="*{name}" placeholder="Name"/>
+    <input type="text" th:field="*{address}" placeholder="Address"/>
+    <input type="text" th:field="*{city}" placeholder="City"/>
+    <input type="text" th:field="*{country}" placeholder="Country"/>
+    <input type="text" th:field="*{contactInfo}" placeholder="Contact Info"/>
+    <button type="submit">Update Hotel</button>
+</form>
+</body>
+</html>

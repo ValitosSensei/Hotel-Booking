@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Керування готелем</title>
+    <style>
+        .tab {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<h1 th:text="${hotel.name}">Назва готелю</h1>
+<a th:href="@{/profile(userId=${userId})}">← Назад до профілю</a>
+
+<!-- Просто вивід даних -->
+<div id="hotelInfo">
+    <h2>Інформація про готель</h2>
+    <p><strong>Назва:</strong> <span th:text="${hotel.name}">Готель</span></p>
+    <p><strong>Адреса:</strong> <span th:text="${hotel.address}">Адреса</span></p>
+    <p><strong>Місто:</strong> <span th:text="${hotel.city}">Місто</span></p>
+    <p><strong>Країна:</strong> <span th:text="${hotel.country}">Країна</span></p>
+    <p><strong>Контактна інформація:</strong> <span th:text="${hotel.contactInfo}">Контакти</span></p>
+</div>
+
+<div id="roomsInfo">
+    <h2>Список кімнат</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Номер кімнати</th>
+            <th>Тип</th>
+            <th>Ціна</th>
+            <th>Доступність</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="room : ${hotel.rooms}">
+            <td th:text="${room.roomNumber}">101</td>
+            <td th:text="${room.type}">Стандарт</td>
+            <td th:text="${room.price}">1000</td>
+            <td th:text="${room.available ? 'Так' : 'Ні'}">Так</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Кнопки для відкриття вкладок редагування -->
+<div class="tab-buttons">
+    <button onclick="showTab('hotelTab')">Редагувати готель</button>
+    <button onclick="showTab('roomsTab')">Редагувати кімнати</button>
+</div>
+
+<!-- Вкладка редагування готелю -->
+<div id="hotelTab" class="tab">
+    <h2>Редагування готелю</h2>
+    <form th:action="@{/manager/editHotel/{hotelId}(hotelId=${hotel.id}, userId=${userId})}"
+          th:object="${hotel}"
+          method="post">
+        <p>Назва: <input type="text" th:field="*{name}" placeholder="Назва готелю" required></p>
+        <p>Адреса: <input type="text" th:field="*{address}" placeholder="Адреса" required></p>
+        <p>Місто: <input type="text" th:field="*{city}" placeholder="Місто" required></p>
+        <p>Країна: <input type="text" th:field="*{country}" placeholder="Країна" required></p>
+        <p>Контактна інформація: <input type="text" th:field="*{contactInfo}" placeholder="Контактна інформація"></p>
+        <button type="submit">Зберегти зміни</button>
+    </form>
+</div>
+
+
+<!-- Вкладка редагування кімнат -->
+<div id="roomsTab" class="tab">
+    <h2>Редагування кімнат</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Номер кімнати</th>
+            <th>Тип</th>
+            <th>Ціна</th>
+            <th>Доступність</th>
+            <th>Дії</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="room : ${hotel.rooms}">
+            <td th:text="${room.roomNumber}">101</td>
+            <td th:text="${room.type}">Стандарт</td>
+            <td th:text="${room.price}">1000</td>
+            <td th:text="${room.available ? 'Так' : 'Ні'}">Так</td>
+            <td>
+                <a th:href="@{/manager/editRoom/{roomId}(roomId=${room.id}, userId=${userId})}">
+                    Редагувати
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <a th:href="@{/manager/hotels/{hotelId}/rooms/create(hotelId=${hotel.id}, userId=${userId})}">
+        <button>Додати кімнату</button>
+    </a>
+</div>
+
+<script>
+    function showTab(tabId) {
+        document.getElementById('hotelInfo').style.display = 'none';
+        document.getElementById('roomsInfo').style.display = 'none';
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.style.display = 'none';
+        });
+        const selectedTab = document.getElementById(tabId);
+        if (selectedTab) {
+            selectedTab.style.display = 'block';
+        }
+    }
+
+    // По замовчуванню: вкладки редагування приховані
+    window.onload = function () {
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.style.display = 'none';
+        });
+    };
+</script>
+
+</body>
+</html>

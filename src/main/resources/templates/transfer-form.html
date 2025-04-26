@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Передача бронювання</title>
+</head>
+<body>
+<h1>Передача бронювання</h1>
+
+<div th:if="${error}" style="color:red">
+    <p th:text="${error}"></p>
+</div>
+
+<form th:action="@{/bookings/{bookingId}/transfer(bookingId=${bookingId})}" method="post">
+    <div>
+        <label>ID нового користувача:</label>
+        <input type="number" name="newUserId" required>
+    </div>
+    <button type="submit">Підтвердити передачу</button>
+</form>
+
+<a th:href="@{/profile}">Назад до профілю</a>
+</body>
+</html>

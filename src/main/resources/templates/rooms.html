@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Rooms in Hotel</title>
+</head>
+<body>
+<h1>Rooms for Hotel ID: <span th:text="${hotelId}"></span></h1>
+
+<!-- Форма фільтрації -->
+<form method="get" th:action="@{/{hotelId}/rooms(hotelId=${hotelId})}">
+    <div>
+        <label>Дата заїзду:</label>
+        <input type="date" name="checkIn" th:value="${checkIn}">
+    </div>
+
+    <div>
+        <label>Дата виїзду:</label>
+        <input type="date" name="checkOut" th:value="${checkOut}">
+    </div>
+
+    <div>
+        <label>Статус:</label>
+        <select name="filter">
+            <option value="all" th:selected="${currentFilter == 'all'}">Всі</option>
+            <option value="available" th:selected="${currentFilter == 'available'}">Вільні</option>
+            <option value="occupied" th:selected="${currentFilter == 'occupied'}">Зайняті</option>
+        </select>
+    </div>
+
+    <button type="submit">Фільтрувати</button>
+</form>
+
+<!-- Таблиця кімнат -->
+<table border="1">
+    <thead>
+    <tr>
+        <th>Номер кімнати</th>
+        <th>Тип</th>
+        <th>Ціна</th>
+        <th>Доступність</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Відображення кімнат -->
+    <tr th:each="room : ${rooms}">
+        <td th:text="${room.roomNumber}"></td>
+        <td th:text="${room.type}"></td>
+        <td th:text="${room.price}"></td>
+
+        <!-- Колонка "Доступність" -->
+        <td>
+    <span th:if="${room.available}">
+        <span th:text="${checkIn != null and checkOut != null ?
+                      (@roomService.isRoomAvailable(room.id, checkIn, checkOut) ? 'Вільна' : 'Зайнята') :
+                      'Вільна'}"></span>
+    </span>
+            <span th:unless="${room.available}">Недоступна</span>
+        </td>
+
+        <!-- Колонка "Дії" -->
+        <td>
+            <a th:if="${room.available}"
+               th:href="@{/bookings/rooms/{roomId}/book(roomId=${room.id})}">
+                Забронювати
+            </a>
+            <span th:unless="${room.available}">Недоступно</span>
+        </td>
+    </tr>
+    </tbody>
+
+</table>
+<a href="/">Back to Home</a>
+</body>
+</html>

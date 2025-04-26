@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Бронювання кімнати</title>
+</head>
+<body>
+<h1>Бронювання кімнати №<span th:text="${booking.room.roomNumber}"></span></h1>
+
+<div th:if="${error}" style="color:red">
+    <p th:text="${error}"></p>
+</div>
+
+<form th:action="@{/bookings/create}" th:object="${booking}" method="post">
+    <input type="hidden" th:field="*{room.id}"/>
+
+
+
+    <div>
+        <label>Дата заїзду:</label>
+        <input type="date" th:field="*{checkInDate}" required>
+    </div>
+
+    <div>
+        <label>Дата виїзду:</label>
+        <input type="date" th:field="*{checkOutDate}" required>
+    </div>
+
+    <button type="submit">Підтвердити бронювання</button>
+</form>
+</body>
+</html>

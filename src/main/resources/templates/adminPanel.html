@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .nav-tabs {
+            display: flex;
+            cursor: pointer;
+        }
+        .nav-tabs div {
+            margin-right: 20px;
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+        }
+        .nav-tabs .active {
+            background-color: #007bff;
+            color: white;
+        }
+        .tab-content {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>Admin Panel</h1>
+
+<!-- Навігаційні вкладки -->
+<div class="nav-tabs">
+    <div class="tab-link active" data-tab="hotels">Hotels</div>
+    <div class="tab-link" data-tab="rooms">Rooms</div>
+    <div class="tab-link" data-tab="requests">Запити</div>
+    <div class="tab-link" data-tab="sync">Синхронізація готелів</div>
+</div>
+<p><a href="/">Back to Home</a></p>
+
+<!-- Вкладка з готелями -->
+<div id="hotels" class="tab-content">
+    <h2>Manage Hotels</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Hotel Name</th>
+            <th>City</th>
+            <th>Country</th>
+            <th>Average Rating</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="hotel : ${hotels}">
+            <td th:text="${hotel.name}"></td>
+            <td th:text="${hotel.city}"></td>
+            <td th:text="${hotel.country}"></td>
+            <td th:text="${hotel.averageRating}"></td>
+            <td>
+                <a th:href="@{/admin/editHotel/{hotelId}(hotelId=${hotel.id})}">Edit</a> |
+                <a th:href="@{/admin/deleteHotel/{hotelId}(hotelId=${hotel.id})}">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Вкладка з кімнатами -->
+<div id="rooms" class="tab-content" style="display: none;">
+    <h2>Manage Rooms</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Room Type</th>
+            <th>Hotel</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="room : ${rooms}">
+            <td th:text="${room.type}"></td>
+            <td th:text="${room.hotel.name}"></td>
+            <td th:text="${room.price}"></td>
+            <td>
+                <a th:href="@{/admin/editRoom/{roomId}(roomId=${room.id})}">Edit</a> |
+                <a th:href="@{/admin/deleteRoom/{roomId}(roomId=${room.id})}">Delete</a>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Вміст вкладки -->
+<div id="requests" class="tab-content" style="display: none;">
+    <h2>Запити на роль менеджера</h2>
+    <table border="1">
+        <thead>
+        <tr>
+            <th>Користувач</th>
+            <th>Дата запиту</th>
+            <th>Дії</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="request : ${requests}">
+            <td th:text="${request.user.email}"></td>
+            <td th:text="${#temporals.format(request.requestDate, 'dd-MM-yyyy HH:mm')}"></td>
+            <td>
+                <form th:action="@{/admin/approve-request/{id}(id=${request.id})}" method="post">
+                    <button type="submit">Схвалити</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div id="sync" class="tab-content" style="display: none;">
+    <h2>Синхронізувати готелі через Amadeus</h2>
+    <form id="syncForm">
+        <label for="cityCode">Код міста:</label>
+        <input type="text" id="cityCode" name="cityCode" required>
+        <button type="submit">Синхронізувати</button>
+    </form>
+
+    <h3>Доступні коди міст:</h3>
+    <ul>
+        <li>PAR - Париж</li>
+        <li>NYC - Нью-Йорк</li>
+        <li>LON - Лондон</li>
+        <li>BER - Берлін</li>
+        <li>ROM - Рим</li>
+        <li>AMS - Амстердам</li>
+        <li>BCN - Барселона</li>
+        <!-- Можемо потім ще більше додати -->
+    </ul>
+
+    <div id="syncResult"></div>
+</div>
+
+<script>
+    document.getElementById('syncForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // щоб не перезавантажувалась сторінка
+
+        var cityCode = document.getElementById('cityCode').value;
+
+        fetch('/api/hotels/sync?cityCode=' + encodeURIComponent(cityCode), {
+            method: 'POST'
+        })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('syncResult').innerText = data;
+            })
+            .catch(error => {
+                document.getElementById('syncResult').innerText = 'Помилка: ' + error;
+            });
+    });
+    document.querySelectorAll('.tab-link').forEach(function(tabLink) {
+        tabLink.addEventListener('click', function() {
+            // Відключити всі вкладки
+            document.querySelectorAll('.tab-link').forEach(function(tabLink) {
+                tabLink.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(function(tabContent) {
+                tabContent.style.display = 'none';
+            });
+
+            // Активувати поточну вкладку
+            this.classList.add('active');
+            var tabName = this.getAttribute('data-tab');
+            document.getElementById(tabName).style.display = 'block';
+        });
+    });
+
+</script>
+</body>
+</html>

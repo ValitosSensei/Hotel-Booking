@@ -1,0 +1,117 @@
+package org.booking.hotelbooking.Controller.WEB;
+
+import org.booking.hotelbooking.DTO.RoomDTO;
+import org.booking.hotelbooking.Entity.Hotel;
+import org.booking.hotelbooking.Entity.RoleRequest;
+import org.booking.hotelbooking.Entity.Room;
+import org.booking.hotelbooking.Repository.RoleRequestRepository;
+import org.booking.hotelbooking.Service.HotelService;
+import org.booking.hotelbooking.Service.RoomService;
+import org.booking.hotelbooking.Service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Controller
+@RequestMapping("/admin")
+public class AdminController {
+
+    private final HotelService hotelService;
+    private final UserService userService;
+    private final RoomService roomService;
+    private final RoleRequestRepository roleRequestRepository;
+
+    @Autowired
+    public AdminController(HotelService hotelService,
+                           UserService userService,
+                           RoomService roomService, RoleRequestRepository roleRequestRepository) {
+        this.hotelService = hotelService;
+        this.userService = userService;
+        this.roomService = roomService;
+        this.roleRequestRepository = roleRequestRepository;
+    }
+
+    @GetMapping
+    public String adminPanel(Model model) {
+        List<Hotel> hotels = hotelService.listHotel();
+        List<Room> rooms = roomService.getAllRooms();
+        List<RoleRequest> requests = roleRequestRepository.findByIsApprovedFalse();
+        model.addAttribute("hotels", hotels);
+        model.addAttribute("rooms", rooms);
+        model.addAttribute("requests", requests);
+        return "adminPanel";
+    }
+
+//    ============Hotel=============
+
+    @GetMapping("/editHotel/{hotelId}")
+    public String showEditHotel(@PathVariable Long hotelId, Model model) {
+        Hotel hotel = hotelService.getHotelById(hotelId);
+        model.addAttribute("hotel", hotel);
+        return "edit-hotel";
+    }
+
+    @PostMapping("/editHotel/{hotelId}")
+    public String editHotel(@PathVariable Long hotelId,
+                            @ModelAttribute Hotel hotel,
+                            RedirectAttributes redirectAttributes) {
+        hotelService.UpdateHotel(hotelId, hotel);
+        redirectAttributes.addFlashAttribute("success", "Hotel updated successfully");
+        return "redirect:/admin";
+    }
+
+    @GetMapping("/deleteHotel/{hotelId}")
+    public String deleteHotel(@PathVariable Long hotelId, RedirectAttributes redirectAttributes) {
+        hotelService.deleteHotel(hotelId);
+        redirectAttributes.addFlashAttribute("success", "Hotel deleted successfully");
+        return "redirect:/admin";
+    }
+//    =============Room=====================
+
+    @GetMapping("/editRoom/{roomId}")
+    public String showEditRoomForm(@PathVariable Long roomId, Model model) {
+        Room room = roomService.getRoomById(roomId);
+        model.addAttribute("room", room);
+        return "edit-room";  // Форма для редагування кімнати
+    }
+
+    @PostMapping("/editRoom/{roomId}")
+    public String editRoom(@PathVariable Long roomId, @ModelAttribute Room roomData, RedirectAttributes redirectAttributes) {
+        Room room = roomService.getRoomById(roomId);
+
+        room.setRoomNumber(roomData.getRoomNumber());
+        room.setType(roomData.getType());
+        room.setPrice(roomData.getPrice());
+        room.setAvailable(roomData.isAvailable());
+
+        room.setHotel(room.getHotel());
+
+        roomService.saveRoom(room);  // Оновлення кімнати
+        redirectAttributes.addFlashAttribute("success", "Кімнату оновлено");
+        return "redirect:/admin";
+    }
+
+    @GetMapping("/deleteRoom/{roomId}")
+    public String deleteRoom(@PathVariable Long roomId, RedirectAttributes redirectAttributes) {
+        roomService.deleteRoom(roomId);  // Видалення кімнати
+        redirectAttributes.addFlashAttribute("success", "Кімнату видалено");
+        return "redirect:/admin";
+    }
+
+//    ================ UserManager==================
+    @PostMapping("/approve-request/{id}")
+    public String approvedRequest(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes
+    ){
+        userService.approveRequest(id);
+        redirectAttributes.addFlashAttribute("successs","Роль мененджера надано");
+        return "redirect:/admin";
+    }
+
+}

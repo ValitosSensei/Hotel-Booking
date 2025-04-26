@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Додати нову кімнату</title>
+</head>
+<body>
+
+<h1>Додавання нової кімнати</h1>
+
+<form th:action="@{/manager/hotels/{hotelId}/rooms/create(hotelId=${room.hotel.id}, userId=${userId})}"
+      th:object="${room}" method="post">
+    <p>Номер кімнати: <input type="text" th:field="*{roomNumber}" required></p>
+    <p>Тип кімнати: <input type="text" th:field="*{type}" required></p>
+    <p>Ціна: <input type="number" th:field="*{price}" step="0.01" required></p>
+    <p>Доступність:
+        <select th:field="*{available}">
+            <option th:value="true">Доступна</option>
+            <option th:value="false">Недоступна</option>
+        </select>
+    </p>
+    <button type="submit">Створити кімнату</button>
+</form>
+
+
+<a th:href="@{/manager/hotels/{hotelId}(hotelId=${room.hotel.id}, userId=${userId})}">← Назад до готелю</a>
+
+</body>
+</html>

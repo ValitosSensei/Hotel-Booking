@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Редагувати кімнату</h1>
+<a href="/profile">← Назад до профілю</a>
+
+<form th:action="@{/manager/editRoom/{roomId}(roomId=${room.id})}" th:object="${room}" method="post">
+    <input type="hidden" name="userId" th:value="${userId}">
+    <p>Номер кімнати: <input type="text" th:field="*{roomNumber}" required></p>
+    <p>Тип: <input type="text" th:field="*{type}" required></p>
+    <p>Ціна: <input type="number" th:field="*{price}" required></p>
+    <p>Доступність: <input type="checkbox" th:field="*{available}"></p>
+    <button type="submit">Зберегти зміни</button>
+</form>
+
+</body>
+</html>

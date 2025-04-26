@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form th:action="@{/admin/editRoom/{roomId}(roomId=${room.id})}" th:object="${room}" method="post">
+    <input type="text" th:field="*{roomNumber}" placeholder="Room Number"/>
+    <input type="text" th:field="*{type}" placeholder="Room Type"/>
+    <input type="number" th:field="*{price}" placeholder="Price"/>
+    <input type="checkbox" th:field="*{available}"/> Available
+    <button type="submit">Update Room</button>
+</form>
+</body>
+</html>
