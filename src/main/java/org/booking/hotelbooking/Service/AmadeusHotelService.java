@@ -68,18 +68,20 @@ public class AmadeusHotelService {
             hotel.setCountry(country);
             hotel.setContactInfo("Not provided");
 
+
+
+            // Замініть блок генерації відгуків:
             List<Review> reviews = new ArrayList<>();
 
-            int reviewCount = random.nextInt(6);
-            for (int i = 0; i < reviewCount; i++) {
-                Review review = new Review();
-                review.setRating(1 + random.nextInt(5)); // Випадковий рейтинг від 1 до 5
-                review.setComment("Автоматичний відгук");
-                review.setCreatedDate(LocalDateTime.now());
-                review.setUser(systemUser); // Або створити "системного" користувача
-                review.setHotel(hotel);
-                reviews.add(review);
-            }
+// Генеруємо лише один відгук на готель
+            Review review = new Review();
+            review.setRating(1 + random.nextInt(5)); // Випадковий рейтинг від 1 до 5
+            review.setComment("Автоматичний відгук");
+            review.setCreatedDate(LocalDateTime.now());
+            review.setUser(systemUser);
+            review.setHotel(hotel);
+            reviews.add(review);
+
             hotel.setReviews(reviews);
 
             // Генерація більшої кількості кімнат

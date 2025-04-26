@@ -62,6 +62,31 @@
     </tbody>
 
 </table>
+<!-- Форма для відгуку -->
+<div th:if="${#authentication.isAuthenticated()}">
+    <h2>Залишити відгук</h2>
+    <form th:action="@{/{hotelId}/reviews(hotelId=${hotelId})}" method="post">
+        <div>
+            <label>Рейтинг (1-5):</label>
+            <input type="number" name="rating" min="1" max="5" required>
+        </div>
+        <div>
+            <label>Коментар:</label>
+            <textarea name="comment" required></textarea>
+        </div>
+        <button type="submit">Надіслати</button>
+    </form>
+</div>
+
+<!-- Список відгуків -->
+<h2>Відгуки</h2>
+<div th:each="review : ${reviews}">
+    <p><strong>Користувач:</strong> <span th:text="${review.user.getFullName()}"></span></p>
+    <p><strong>Рейтинг:</strong> <span th:text="${review.rating}"></span>/5</p>
+    <p><strong>Коментар:</strong> <span th:text="${review.comment}"></span></p>
+    <p><small th:text="${#temporals.format(review.createdDate, 'dd-MM-yyyy HH:mm')}"></small></p>
+    <hr>
+</div>
 <a href="/">Back to Home</a>
 </body>
 </html>

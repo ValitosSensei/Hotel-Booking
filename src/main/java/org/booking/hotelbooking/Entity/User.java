@@ -43,6 +43,9 @@ public class User {
     @OneToMany(mappedBy = "transferredTo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Booking> transferredBookings = new ArrayList<>();
 
+    public String getFullName() {
+        return this.firstName + " " + this.lastName;
+    }
     public User(){
 
     }

@@ -8,6 +8,8 @@ import org.booking.hotelbooking.Entity.Hotel;
 import org.booking.hotelbooking.Entity.Role;
 import org.booking.hotelbooking.Entity.Room;
 import org.booking.hotelbooking.Entity.User;
+import org.booking.hotelbooking.Entity.Review;
+import org.booking.hotelbooking.Service.ReviewService;
 import org.booking.hotelbooking.Service.HotelService;
 import org.booking.hotelbooking.Service.RoomService;
 import org.booking.hotelbooking.Service.UserService;
@@ -16,12 +18,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -35,14 +39,17 @@ public class HotelController {
     private final HotelService hotelService;
     private final RoomService roomService;
     private final UserService userService;
+    private final ReviewService reviewService;
 
     @Autowired
     public HotelController(HotelService hotelService,
                            RoomService roomService,
-                           UserService userService) {
+                           UserService userService,
+                           ReviewService reviewService) {
         this.hotelService = hotelService;
         this.roomService = roomService;
         this.userService = userService;
+        this.reviewService = reviewService;
     }
 
     @GetMapping("/")
@@ -76,6 +83,7 @@ public class HotelController {
     }
 
     @GetMapping("/{hotelId}/rooms")
+    @Transactional
     public String getRooms(
             @PathVariable Long hotelId,
             @RequestParam(name = "filter", defaultValue = "all") String filter,
@@ -95,6 +103,11 @@ public class HotelController {
             model.addAttribute("checkIn", checkIn);
             model.addAttribute("checkOut", checkOut);
             model.addAttribute("currentFilter", filter);
+
+            Hotel hotel = hotelService.getHotelById(hotelId);
+            List<Review> reviews = reviewService.getReviewsByHotel(hotel);
+            model.addAttribute("reviews", reviews);
+
             return "rooms";
         } catch (RuntimeException ex) {
             model.addAttribute("error", ex.getMessage());
@@ -142,6 +155,28 @@ public class HotelController {
         }
 
         return "redirect:/";
+    }
+
+    @PostMapping("/{hotelId}/reviews")
+    public String submitReview(
+            @PathVariable Long hotelId,
+            @RequestParam Integer rating,
+            @RequestParam String comment,
+            Principal principal, // Для отримання поточного користувача
+            RedirectAttributes redirectAttributes
+    ) {
+        User user = userService.getUserByEmail(principal.getName());
+        Hotel hotel = hotelService.getHotelById(hotelId);
+
+        // Перевірка, чи користувач має бронювання в цьому готелі (додайте логіку за потребою)
+        // if (!bookingService.hasUserBookedHotel(user, hotel)) {
+        //     redirectAttributes.addFlashAttribute("error", "Ви не можете залишити відгук без бронювання");
+        //     return "redirect:/{hotelId}/rooms";
+        // }
+
+        reviewService.createOrUpdateReview(user, hotel, rating, comment);
+        redirectAttributes.addFlashAttribute("success", "Відгук збережено");
+        return "redirect:/{hotelId}/rooms";
     }
 
 
