@@ -50,41 +50,36 @@ public class RoomService {
         roomRepository.save(room);
     }
 
+    @Transactional(readOnly = true)
     public List<RoomDTO> getRoomsInHotelWithFilter(
             Long hotelId,
             String availabilityFilter,
             LocalDate checkIn,
             LocalDate checkOut) {
+
         List<Room> rooms;
 
-        if (checkIn != null && checkOut != null) {
+        boolean hasDates = (checkIn != null && checkOut != null);
+
+        if (hasDates) {
             switch (availabilityFilter) {
-                case "available":
-                    rooms = roomRepository.findAvailableRoomsByDates(hotelId, checkIn, checkOut);
-                    break;
-                case "occupied":
-                    rooms = roomRepository.findOccupiedRoomsByDates(hotelId, checkIn, checkOut);
-                    break;
-                default:
-                    // Для "all" об'єднуємо обидва списки
-                    List<Room> available = roomRepository.findAvailableRoomsByDates(hotelId, checkIn, checkOut);
-                    List<Room> occupied = roomRepository.findOccupiedRoomsByDates(hotelId, checkIn, checkOut);
-                    rooms = new ArrayList<>();
-                    rooms.addAll(available);
-                    rooms.addAll(occupied);
-                    break;
+                case "available" -> rooms = roomRepository.findAvailableRoomsByDates(hotelId, checkIn, checkOut);
+                case "occupied" -> rooms = roomRepository.findOccupiedRoomsByDates(hotelId, checkIn, checkOut);
+                default -> rooms = roomRepository.findByHotelId(hotelId);
             }
         } else {
-            // Фільтрація без дат - тільки по полю available
-            rooms = switch (availabilityFilter) {
-                case "available" -> roomRepository.findByHotelIdAndAvailable(hotelId, true);
-                case "occupied" -> roomRepository.findByHotelIdAndAvailable(hotelId, false);
-                default -> roomRepository.findByHotelId(hotelId);
-            };
+            // Якщо дати не вказані, відображаємо всі кімнати готелю
+            rooms = roomRepository.findByHotelId(hotelId);
         }
 
         return rooms.stream()
-                .map(RoomDTO::new)
+                .map(room -> {
+                    RoomDTO dto = new RoomDTO(room);
+                    if (hasDates) {
+                        dto.setAvailableForDates(isRoomAvailable(room.getId(), checkIn, checkOut));
+                    }
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -99,7 +94,7 @@ public class RoomService {
             room.setRoomNumber(roomDTO.getRoomNumber());
             room.setType(roomDTO.getType());
             room.setPrice(roomDTO.getPrice());
-            room.setAvailable(roomDTO.isAvailable());
+            room.setAvailableForDates(roomDTO.isAvailableForDates());
             room.setHotel(hotel);
             roomRepository.save(room);
         }
@@ -117,7 +112,7 @@ public class RoomService {
         room.setRoomNumber(roomDTO.getRoomNumber());
         room.setType(roomDTO.getType());
         room.setPrice(roomDTO.getPrice());
-        room.setAvailable(roomDTO.isAvailable());
+        room.setAvailableForDates(roomDTO.isAvailableForDates());
         roomRepository.save(room);
     }
 

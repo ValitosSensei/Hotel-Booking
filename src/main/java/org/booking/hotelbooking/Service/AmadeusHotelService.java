@@ -89,7 +89,7 @@ public class AmadeusHotelService {
                 room.setRoomNumber("R" + (100 + random.nextInt(900)));
                 room.setType(getRandomRoomType());
                 room.setPrice(new BigDecimal(50 + random.nextInt(200)));
-                room.setAvailable(true);
+                room.setAvailableForDates(true);
                 room.setHotel(hotel);  // Встановлюємо готель для кімнати
                 hotel.getRooms().add(room);
             }

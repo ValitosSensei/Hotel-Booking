@@ -17,8 +17,7 @@ public class Booking {
     private LocalDate  checkOutDate;
 
     @Enumerated(EnumType.STRING)
-    private BookingStatus status;
-
+    private BookingStatus status = BookingStatus.CONFIRMED;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

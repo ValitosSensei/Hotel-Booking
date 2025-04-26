@@ -9,7 +9,8 @@ public class RoomDTO {
     private String roomNumber;
     private String type;
     private BigDecimal price;
-    private boolean available;
+
+    private boolean availableForDates;
 
     public RoomDTO() {
 
@@ -20,7 +21,16 @@ public class RoomDTO {
         this.roomNumber = room.getRoomNumber();
         this.type = room.getType();
         this.price = room.getPrice();
-        this.available = room.isAvailable();
+        this.availableForDates = room.isAvailableForDates();
+
+    }
+
+    public boolean isAvailableForDates() {
+        return availableForDates;
+    }
+
+    public void setAvailableForDates(boolean availableForDates) {
+        this.availableForDates = availableForDates;
     }
 
     public Long getId() {
@@ -55,11 +65,4 @@ public class RoomDTO {
         this.price = price;
     }
 
-    public boolean isAvailable() {
-        return available;
-    }
-
-    public void setAvailable(boolean available) {
-        this.available = available;
-    }
 }

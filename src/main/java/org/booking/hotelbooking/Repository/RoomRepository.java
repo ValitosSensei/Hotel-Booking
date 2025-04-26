@@ -20,12 +20,14 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
 
 
     List<Room> findByHotelId(Long hotelId);
-    List<Room> findByHotelIdAndAvailable(Long hotelId, boolean available);
+
+
 
     @Query("SELECT r FROM Room r WHERE r.hotel.id = :hotelId " +
             "AND EXISTS (" +
             "   SELECT b FROM Booking b WHERE b.room = r " +
-            "   AND (:checkOut > b.checkInDate AND :checkIn < b.checkOutDate)" +
+            "   AND b.status = 'CONFIRMED' " +
+            "   AND (b.checkInDate <= :checkOut AND b.checkOutDate >= :checkIn)" +
             ")")
     List<Room> findOccupiedRoomsByDates(
             @Param("hotelId") Long hotelId,
@@ -34,10 +36,10 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     );
 
     @Query("SELECT r FROM Room r WHERE r.hotel.id = :hotelId " +
-            "AND r.available = true " + // Додано перевірку на загальну доступність
             "AND NOT EXISTS (" +
             "   SELECT b FROM Booking b WHERE b.room = r " +
-            "   AND (:checkOut > b.checkInDate AND :checkIn < b.checkOutDate)" +
+            "   AND b.status = 'CONFIRMED' " +
+            "   AND (b.checkInDate < :checkOut AND b.checkOutDate > :checkIn)" + // Змінено умову
             ")")
     List<Room> findAvailableRoomsByDates(
             @Param("hotelId") Long hotelId,
@@ -48,11 +50,8 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     @Query("SELECT CASE WHEN COUNT(b) = 0 THEN true ELSE false END " +
             "FROM Booking b " +
             "WHERE b.room.id = :roomId " +
-            "AND (" +
-            "   (b.checkInDate <= :checkIn AND b.checkOutDate >= :checkOut) OR " +
-            "   (b.checkInDate BETWEEN :checkIn AND :checkOut) OR " +
-            "   (b.checkOutDate BETWEEN :checkIn AND :checkOut)" +
-            ")")
+            "AND b.status = 'CONFIRMED' " +
+            "AND (b.checkInDate < :checkOut AND b.checkOutDate > :checkIn)") // Змінено умову
     boolean isRoomAvailable(
             @Param("roomId") Long roomId,
             @Param("checkIn") LocalDate checkIn,

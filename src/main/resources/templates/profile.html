@@ -11,6 +11,9 @@
     <p style="color: red;" th:text="${error}"></p>
 </div>
 <h1>User Profile</h1>
+<form th:action="@{/logout}" method="post" style="display: inline;">
+    <button type="submit">Вийти</button>
+</form>
 <a href="/">Back to Home</a>
 
 <div>

@@ -6,7 +6,7 @@ public class CreateRoomDTO {
     private String roomNumber;
     private String type;
     private BigDecimal price;
-    private boolean available;
+    private boolean availableForDates;
 
     public String getRoomNumber() {
         return roomNumber;
@@ -32,11 +32,12 @@ public class CreateRoomDTO {
         this.price = price;
     }
 
-    public boolean isAvailable() {
-        return available;
+
+    public boolean isAvailableForDates() {
+        return availableForDates;
     }
 
-    public void setAvailable(boolean available) {
-        this.available = available;
+    public void setAvailableForDates(boolean availableForDates) {
+        this.availableForDates = availableForDates;
     }
 }

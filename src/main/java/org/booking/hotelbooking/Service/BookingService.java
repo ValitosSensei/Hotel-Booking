@@ -42,14 +42,14 @@ public class BookingService {
             throw new RuntimeException("Кімната не знайдена");
         }
 
-        if (!roomService.isRoomAvailable(room.getId(), booking.getCheckInDate(), booking.getCheckOutDate())) {
+        if (!roomService.isRoomAvailable(booking.getRoom().getId(), booking.getCheckInDate(), booking.getCheckOutDate())) {
             throw new RuntimeException("Кімната вже зайнята на ці дати");
         }
 
         // Прив'язуємо завантажену кімнату до бронювання
         booking.setRoom(room);
 
-        room.setAvailable(false);
+
         roomRepository.save(room);
 
         return bookingRepository.save(booking);
@@ -60,7 +60,7 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("Бронювання не знайдено"));
 
         Room room = booking.getRoom();
-        room.setAvailable(true); // Відновлюємо статус "вільна"
+
         roomRepository.save(room);
 
         bookingRepository.delete(booking);

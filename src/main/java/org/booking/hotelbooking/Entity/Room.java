@@ -19,7 +19,7 @@ public class Room {
 
     private BigDecimal price;
 
-    private boolean available = true;
+    private boolean availableForDates;
 
     @ManyToOne
     @JoinColumn(name = "hotel_id", nullable = false)
@@ -32,14 +32,22 @@ public class Room {
 
     }
 
-    public Room(Long id, String roomNumber, String type, BigDecimal price, boolean available, Hotel hotel, List<Booking> bookings) {
+    public Room(Long id, String roomNumber, String type, BigDecimal price, boolean availableForDates, Hotel hotel, List<Booking> bookings) {
         this.id = id;
         this.roomNumber = roomNumber;
         this.type = type;
         this.price = price;
-        this.available = available;
+        this.availableForDates = availableForDates;
         this.hotel = hotel;
         this.bookings = bookings;
+    }
+
+    public boolean isAvailableForDates() {
+        return availableForDates;
+    }
+
+    public void setAvailableForDates(boolean availableForDates) {
+        this.availableForDates = availableForDates;
     }
 
     public Long getId() {
@@ -92,11 +100,5 @@ public class Room {
         this.bookings = bookings;
     }
 
-    public boolean isAvailable() {
-        return available;
-    }
 
-    public void setAvailable(boolean available) {
-        this.available = available;
-    }
 }

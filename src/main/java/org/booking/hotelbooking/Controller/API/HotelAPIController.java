@@ -46,7 +46,7 @@ public class HotelAPIController {
         room.setRoomNumber("101");
         room.setType("Standard");
         room.setPrice(BigDecimal.valueOf(100));
-        room.setAvailable(true);
+        room.setAvailableForDates(true);
 
         dto.setRooms(Collections.singletonList(room));
         hotelService.createHotelWithRooms(dto);

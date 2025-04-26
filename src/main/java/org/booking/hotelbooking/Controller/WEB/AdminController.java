@@ -87,7 +87,7 @@ public class AdminController {
         room.setRoomNumber(roomData.getRoomNumber());
         room.setType(roomData.getType());
         room.setPrice(roomData.getPrice());
-        room.setAvailable(roomData.isAvailable());
+        room.setAvailableForDates(roomData.isAvailableForDates());
 
         room.setHotel(room.getHotel());
 

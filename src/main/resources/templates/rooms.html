@@ -48,23 +48,15 @@
         <td th:text="${room.type}"></td>
         <td th:text="${room.price}"></td>
 
-        <!-- Колонка "Доступність" -->
         <td>
-    <span th:if="${room.available}">
-        <span th:text="${checkIn != null and checkOut != null ?
-                      (@roomService.isRoomAvailable(room.id, checkIn, checkOut) ? 'Вільна' : 'Зайнята') :
-                      'Вільна'}"></span>
-    </span>
-            <span th:unless="${room.available}">Недоступна</span>
+            <span th:text="${room.availableForDates ? 'Вільна' : 'Зайнята'}"></span>
         </td>
-
-        <!-- Колонка "Дії" -->
         <td>
-            <a th:if="${room.available}"
-               th:href="@{/bookings/rooms/{roomId}/book(roomId=${room.id})}">
+            <a th:if="${room.availableForDates}"
+               th:href="@{/bookings/rooms/{roomId}/book(roomId=${room.id}, checkIn=${checkIn}, checkOut=${checkOut})}">
                 Забронювати
             </a>
-            <span th:unless="${room.available}">Недоступно</span>
+            <span th:unless="${room.availableForDates}">Недоступно</span>
         </td>
     </tr>
     </tbody>

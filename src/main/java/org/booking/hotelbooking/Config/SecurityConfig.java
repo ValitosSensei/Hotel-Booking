@@ -19,8 +19,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/register", "/login", "/css/**", "/js/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll() // Доступ до ВСЬОГО без авторизації
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -29,17 +28,20 @@ public class SecurityConfig {
                         .passwordParameter("password")
                         .defaultSuccessUrl("/profile", true)
                         .failureUrl("/login?error=true")
+                        .permitAll()
                 )
                 .logout(logout -> logout
+                        .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
+                        .permitAll()
                 )
                 .sessionManagement(session -> session
                         .maximumSessions(1)
                         .expiredUrl("/login?expired=true")
                 )
-                .csrf(csrf -> csrf.disable());
+                .csrf(csrf -> csrf.disable()); // Вимкнути CSRF (зручно для тестів, небезпечно в продакшені)
 
         return http.build();
     }
@@ -61,8 +63,6 @@ public class SecurityConfig {
     @Bean
     @SuppressWarnings("deprecation")
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return NoOpPasswordEncoder.getInstance(); // Без шифрування (тільки на час розробки!)
     }
-
-
 }

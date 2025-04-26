@@ -110,7 +110,7 @@ public class ManagerController {
         room.setRoomNumber(roomData.getRoomNumber());
         room.setType(roomData.getType());
         room.setPrice(roomData.getPrice());
-        room.setAvailable(roomData.isAvailable());
+        room.setAvailableForDates(roomData.isAvailableForDates());
         roomService.saveRoom(room);
 
         redirectAttributes.addAttribute("userId", userId);

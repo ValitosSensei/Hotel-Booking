@@ -58,7 +58,7 @@ public class HotelService {
             room.setRoomNumber(roomDTO.getRoomNumber());
             room.setType(roomDTO.getType());
             room.setPrice(roomDTO.getPrice());
-            room.setAvailable(roomDTO.isAvailable());
+            room.setAvailableForDates(roomDTO.isAvailableForDates());
             return room;
         }).collect(Collectors.toList());
 

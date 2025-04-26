@@ -84,14 +84,17 @@ public class HotelController {
             Model model
     ) {
         try {
-            List<RoomDTO> rooms = roomService.getRoomsInHotelWithFilter(hotelId, filter, checkIn, checkOut);
+            // Валідація дат
+            if (checkIn != null && checkOut != null && checkIn.isAfter(checkOut)) {
+                throw new IllegalArgumentException("Дата заїзду повинна бути раніше дати виїзду");
+            }
 
-            model.addAttribute("roomService", roomService);
+            List<RoomDTO> rooms = roomService.getRoomsInHotelWithFilter(hotelId, filter, checkIn, checkOut);
             model.addAttribute("rooms", rooms);
             model.addAttribute("hotelId", hotelId);
             model.addAttribute("checkIn", checkIn);
             model.addAttribute("checkOut", checkOut);
-            model.addAttribute("currentFilter", filter); // Додаємо поточний фільтр до моделі
+            model.addAttribute("currentFilter", filter);
             return "rooms";
         } catch (RuntimeException ex) {
             model.addAttribute("error", ex.getMessage());

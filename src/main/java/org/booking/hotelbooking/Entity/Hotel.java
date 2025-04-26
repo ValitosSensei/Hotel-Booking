@@ -37,6 +37,15 @@ public class Hotel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
+    private boolean availableForDates;
+
+    public boolean isAvailableForDates() {
+        return availableForDates;
+    }
+
+    public void setAvailableForDates(boolean availableForDates) {
+        this.availableForDates = availableForDates;
+    }
 
     public User getOwner() {
         return owner;
