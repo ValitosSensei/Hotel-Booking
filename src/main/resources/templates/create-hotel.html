@@ -10,9 +10,6 @@
 <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
 <form th:action="@{/create}" th:object="${hotelDTO}" method="post">
-    <label>ID Користувача:</label>
-    <input type="number" th:field="*{userId}" required/><br/>
-
 
     <label>Назва:</label>
     <input type="text" th:field="*{name}" required/><br/>
@@ -42,7 +39,7 @@
             <input type="number" step="0.01" th:field="*{rooms[__${iStat.index}__].price}" required/><br/>
 
             <label>Доступна:</label>
-            <input type="checkbox" th:field="*{rooms[__${iStat.index}__].available}" /><br/>
+            <input type="checkbox" th:field="*{rooms[__${iStat.index}__].availableForDates}" /><br/>
 
             <hr/>
         </div>

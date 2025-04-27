@@ -2,111 +2,133 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>User Profile</title>
+    <link rel="stylesheet" href="/profile.css">
 </head>
 <body>
+
+<div class="header">
+    <a href="/" class="logo-link">
+        <img src="path-to-logo.png" alt="Logo" class="logo">
+        <h1 class="site-name">Hotel Booking</h1>
+    </a>
+    <form th:action="@{/logout}" method="post" class="logout-form">
+        <button type="submit" class="logout-btn">Вийти</button>
+    </form>
+</div>
+
 <div th:if="${message}">
     <p style="color: green;" th:text="${message}"></p>
 </div>
 <div th:if="${error}">
     <p style="color: red;" th:text="${error}"></p>
 </div>
-<h1>User Profile</h1>
-<form th:action="@{/logout}" method="post" style="display: inline;">
-    <button type="submit">Вийти</button>
-</form>
-<a href="/">Back to Home</a>
 
-<div>
-    <h2>Personal Information</h2>
-    <p>ID: <span th:text="${user.id}"></span></p>
-    <p>Name: <span th:text="${user.firstName + ' ' + user.lastName}"></span></p>
-    <p>Email: <span th:text="${user.email}"></span></p>
-    <p>Phone: <span th:text="${user.phone}"></span></p>
-</div>
-
-<div th:unless="${#lists.contains(user.roles, T(org.booking.hotelbooking.Entity.Role).ROLE_MANAGER)}">
-    <form th:action="@{/profile/request-manager}" method="post">
-
-        <button type="submit">Надіслати запит на роль менеджера</button>
-    </form>
-</div>
-
-<div th:if="${not #lists.isEmpty(user.bookings)}">
-    <h2>Booking History</h2>
-    <table border="1">
-        <thead>
-        <tr>
-            <th>Booking ID</th>
-            <th>Room Number</th>
-            <th>Check-in Date</th>
-            <th>Check-out Date</th>
-            <th>Transfer</th>
-            <th>Status</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="booking : ${user.bookings}">
-            <td th:text="${booking.id}"></td>
-            <td th:text="${booking.room.roomNumber}"></td>
-            <td th:text="${#temporals.format(booking.checkInDate, 'dd-MM-yyyy')}"></td>
-            <td th:text="${#temporals.format(booking.checkOutDate, 'dd-MM-yyyy')}"></td>
-            <td>
-                <form th:action="@{/bookings/{bookingId}/cancel(bookingId=${booking.id})}" method="post">
-                    <button type="submit">Скасувати</button>
-                </form>
-                <a th:href="@{/bookings/{bookingId}/transfer(bookingId=${booking.id})}">Передати</a>
-            </td>
-            <td>
-                <form th:action="@{/bookings/{bookingId}/request-transfer(bookingId=${booking.id})}" method="get">
-                    <button type="submit">Передати</button>
-                </form>
-            </td>
-            <td th:text="${booking.status}"></td>
-            <td>
-                <form th:if="${booking.status == T(org.booking.hotelbooking.Entity.BookingStatus).PENDING}"
-                      th:action="@{/bookings/{bookingId}/confirm(bookingId=${booking.id})}" method="post">
-                    <button type="submit">Підтвердити через кнопку</button>
-                </form>
-            </td>
-            <td>
-                <span th:if="${booking.transferredFrom != null}">
-                     Передано від: <span th:text="${booking.transferredFrom.email}"></span>
-                </span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-<!-- Додати цей блок після персональної інформації -->
-<div th:if="${isManager}">
-    <h2>Управління вашими готелями</h2>
-    <div th:if="${not #lists.isEmpty(userHotels)}">
-        <table border="1">
-            <thead>
-            <tr>
-                <th>Назва готелю</th>
-                <th>Місто</th>
-                <th>Дії</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="hotel : ${userHotels}">
-                <td th:text="${hotel.name}"></td>
-                <td th:text="${hotel.city}"></td>
-                <td>
-                    <a th:href="@{/manager/hotels/{hotelId}(hotelId=${hotel.id}, userId=${user.id})}">Редагувати готель</a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+<div class="container">
+    <div class="sidebar">
+        <!-- Navigation tabs -->
+        <button class="tab-link active" onclick="openTab(event, 'personalInfo')">Персональна інформація</button>
+        <button class="tab-link" onclick="openTab(event, 'bookings')">Історія бронювань</button>
+        <button class="tab-link" th:if="${isManager}" onclick="openTab(event, 'manager')">Управління готелями</button>
     </div>
-    <div th:if="${#lists.isEmpty(userHotels)}">
-        <p>У вас поки немає готелів для управління.</p>
+
+    <!-- Tab content -->
+    <div class="tab-content-wrapper">
+        <div id="personalInfo" class="tab-content">
+            <h2>Personal Information</h2>
+            <p>ID: <span th:text="${user.id}"></span></p>
+            <p>Name: <span th:text="${user.firstName + ' ' + user.lastName}"></span></p>
+            <p>Email: <span th:text="${user.email}"></span></p>
+            <p>Phone: <span th:text="${user.phone}"></span></p>
+
+            <div th:unless="${#lists.contains(user.roles, T(org.booking.hotelbooking.Entity.Role).ROLE_MANAGER)}">
+                <form th:action="@{/profile/request-manager}" method="post">
+                    <button type="submit">Надіслати запит на роль менеджера</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="bookings" class="tab-content">
+            <h2>Booking History</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Room Number</th>
+                    <th>Check-in Date</th>
+                    <th>Check-out Date</th>
+                    <th>Transfer</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="booking : ${user.bookings}">
+                    <td th:text="${booking.id}"></td>
+                    <td th:text="${booking.room.roomNumber}"></td>
+                    <td th:text="${#temporals.format(booking.checkInDate, 'dd-MM-yyyy')}"></td>
+                    <td th:text="${#temporals.format(booking.checkOutDate, 'dd-MM-yyyy')}"></td>
+                    <td>
+                        <form th:action="@{/bookings/{bookingId}/cancel(bookingId=${booking.id})}" method="post">
+                            <button type="submit">Скасувати</button>
+                        </form>
+                        <a th:href="@{/bookings/{bookingId}/transfer(bookingId=${booking.id})}">Передати</a>
+                    </td>
+                    <td th:text="${booking.status}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="manager" class="tab-content">
+            <h2>Управління вашими готелями</h2>
+            <a th:href="@{/manager/create-hotel}">
+                <button>Створити новий готель</button>
+            </a>
+            <div th:if="${not #lists.isEmpty(userHotels)}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Назва готелю</th>
+                        <th>Місто</th>
+                        <th>Дії</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="hotel : ${userHotels}">
+                        <td th:text="${hotel.name}"></td>
+                        <td th:text="${hotel.city}"></td>
+                        <td>
+                            <a th:href="@{/manager/hotels/{hotelId}(hotelId=${hotel.id}, userId=${user.id})}">Редагувати готель</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${#lists.isEmpty(userHotels)}">
+                <p>У вас поки немає готелів для управління.</p>
+            </div>
+        </div>
     </div>
 </div>
-<div th:if="${#lists.isEmpty(user.bookings)}">
-    <p>No bookings found.</p>
-</div>
+
+<script>function openTab(evt, tabName) {
+    var i, tabContent, tabLinks;
+
+    // Сховати всі вкладки
+    tabContent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabContent.length; i++) {
+        tabContent[i].style.display = "none";
+    }
+
+    // Виділити активну вкладку
+    tabLinks = document.getElementsByClassName("tab-link");
+    for (i = 0; i < tabLinks.length; i++) {
+        tabLinks[i].classList.remove("active");
+    }
+
+    // Показати обрану вкладку
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.classList.add("active");
+}</script>
+
 </body>
 </html>

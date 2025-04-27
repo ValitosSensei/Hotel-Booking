@@ -1,5 +1,7 @@
 package org.booking.hotelbooking.Controller.WEB;
 
+import org.booking.hotelbooking.DTO.CreateHotelWithRoomsDTO;
+import org.booking.hotelbooking.DTO.CreateRoomDTO;
 import org.booking.hotelbooking.Entity.Hotel;
 import org.booking.hotelbooking.Entity.Role;
 import org.booking.hotelbooking.Entity.Room;
@@ -8,6 +10,7 @@ import org.booking.hotelbooking.Service.HotelService;
 import org.booking.hotelbooking.Service.RoomService;
 import org.booking.hotelbooking.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -145,4 +148,35 @@ public class ManagerController {
         redirectAttributes.addAttribute("userId", userId);
         return "redirect:/manager/hotels/{hotelId}";
     }
+
+//    @GetMapping("/create-hotel")
+//    public String showCreateHotelForm(
+//            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
+//            Model model
+//    ) {
+//        User user = userService.getUserByEmail(securityUser.getUsername());
+//        CreateHotelWithRoomsDTO dto = new CreateHotelWithRoomsDTO();
+//        dto.getRooms().add(new CreateRoomDTO());
+//        model.addAttribute("hotelDTO", dto);
+//        model.addAttribute("userId", user.getId());
+//        return "create-hotel";
+//    }
+//
+//    @PostMapping("/create-hotel")
+//    public String createHotel(
+//            @ModelAttribute("hotelDTO") CreateHotelWithRoomsDTO hotelDTO,
+//            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
+//            RedirectAttributes redirectAttributes
+//    ) {
+//        User user = userService.getUserByEmail(securityUser.getUsername());
+//        hotelDTO.setUserId(user.getId()); // Автоматично встановлюємо ID менеджера
+//
+//        try {
+//            hotelService.createHotelWithRooms(hotelDTO);
+//            redirectAttributes.addFlashAttribute("success", "Готель створено!");
+//        } catch (RuntimeException ex) {
+//            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+//        }
+//        return "redirect:/profile";
+//    }
 }
