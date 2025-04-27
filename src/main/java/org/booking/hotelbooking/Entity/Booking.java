@@ -37,6 +37,9 @@ public class Booking {
     @JoinColumn(name = "transferred_to_id")
     private User transferredTo;
 
+    private String transferToken; // Токен для підтвердження передачі
+    private LocalDateTime transferRequestTime; // Час створення запиту
+
     private String confirmationToken;
 
     public Booking() {}
@@ -44,7 +47,7 @@ public class Booking {
     public Booking(Long id, LocalDateTime bookingDate, LocalDate checkInDate,
                    LocalDate checkOutDate, BookingStatus status, LocalDateTime createdAt,
                    User user, Room room, User transferredFrom, User transferredTo,
-                   String confirmationToken) {
+                   String transferToken, LocalDateTime transferRequestTime, String confirmationToken) {
         this.id = id;
         this.bookingDate = bookingDate;
         this.checkInDate = checkInDate;
@@ -55,7 +58,25 @@ public class Booking {
         this.room = room;
         this.transferredFrom = transferredFrom;
         this.transferredTo = transferredTo;
+        this.transferToken = transferToken;
+        this.transferRequestTime = transferRequestTime;
         this.confirmationToken = confirmationToken;
+    }
+
+    public String getTransferToken() {
+        return transferToken;
+    }
+
+    public void setTransferToken(String transferToken) {
+        this.transferToken = transferToken;
+    }
+
+    public LocalDateTime getTransferRequestTime() {
+        return transferRequestTime;
+    }
+
+    public void setTransferRequestTime(LocalDateTime transferRequestTime) {
+        this.transferRequestTime = transferRequestTime;
     }
 
     public String getConfirmationToken() {

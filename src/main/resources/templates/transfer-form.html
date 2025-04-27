@@ -10,12 +10,12 @@
     <p th:text="${error}"></p>
 </div>
 
-<form th:action="@{/bookings/{bookingId}/transfer(bookingId=${bookingId})}" method="post">
+<form th:action="@{/bookings/{bookingId}/request-transfer(bookingId=${bookingId})}" method="post">
     <div>
-        <label>ID нового користувача:</label>
-        <input type="number" name="newUserId" required>
+        <label>Email нового користувача:</label>
+        <input type="email" name="newUserEmail" required>
     </div>
-    <button type="submit">Підтвердити передачу</button>
+    <button type="submit">Запросити передачу</button>
 </form>
 
 <a th:href="@{/profile}">Назад до профілю</a>

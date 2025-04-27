@@ -143,4 +143,33 @@ public class BookingController {
         }
         return "redirect:/profile";
     }
+
+    @PostMapping("/{bookingId}/request-transfer")
+    public String requestTransfer(
+            @PathVariable Long bookingId,
+            @RequestParam("newUserEmail") String newUserEmail,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            bookingService.requestTransfer(bookingId, newUserEmail);
+            redirectAttributes.addFlashAttribute("success", "Запит на передачу відправлено");
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/profile";
+    }
+
+    @GetMapping("/transfer/confirm")
+    public String confirmTransfer(
+            @RequestParam String token,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            bookingService.confirmTransfer(token);
+            redirectAttributes.addFlashAttribute("success", "Передачу підтверджено");
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/profile";
+    }
 }

@@ -14,8 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
@@ -89,6 +91,27 @@ public class BookingService {
 
 
     @Transactional
+    public void requestTransfer(Long bookingId, String newUserEmail) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Бронювання не знайдено"));
+
+        User newUser = userService.getUserByEmail(newUserEmail);
+
+
+
+        // Генерація токену та збереження часу
+        String transferToken = UUID.randomUUID().toString();
+        booking.setTransferToken(transferToken);
+        booking.setTransferRequestTime(LocalDateTime.now());
+        booking.setTransferredTo(newUser); // Встановлюємо майбутнього власника
+
+        bookingRepository.save(booking);
+
+        // Відправка email
+        String confirmationLink = "http://ваш-сайт/bookings/transfer/confirm?token=" + transferToken;
+        emailService.sendTransferConfirmationEmail(newUser.getEmail(), confirmationLink);
+    }
+    @Transactional
     public void transferBooking(Long bookingId, Long newUserId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Бронювання не знайдено"));
@@ -110,12 +133,39 @@ public class BookingService {
     }
 
     @Transactional
+    public void confirmTransfer(String token) {
+        Booking booking = bookingRepository.findByTransferToken(token)
+                .orElseThrow(() -> new RuntimeException("Невірний токен"));
+
+        // Перевірка часу
+        long hoursPassed = ChronoUnit.HOURS.between(booking.getTransferRequestTime(), LocalDateTime.now());
+        if (hoursPassed > 24) {
+            throw new RuntimeException("Час на підтвердження передачі минув");
+        }
+
+        User oldUser = booking.getUser();
+        User newUser = booking.getTransferredTo();
+
+        // Оновлення зв'язків
+        oldUser.getBookings().remove(booking);
+        newUser.getBookings().add(booking);
+        booking.setUser(newUser);
+        booking.setTransferredFrom(oldUser);
+        booking.setTransferToken(null);
+
+        userService.saveUser(oldUser);
+        userService.saveUser(newUser);
+        bookingRepository.save(booking);
+    }
+    @Transactional
     public void confirmBooking(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Бронювання не знайдено"));
         booking.setStatus(BookingStatus.CONFIRMED);
         bookingRepository.save(booking);
     }
+
+
 
     public List<Booking> getPendingBookings() {
         return bookingRepository.findByStatus(BookingStatus.PENDING);
@@ -136,7 +186,20 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("Невірний токен"));
     }
 
+    public List<Booking> getPendingTransfers() {
+        List<Booking> allTransfers = bookingRepository.findByTransferredToIsNotNull();
 
+        return allTransfers.stream()
+                .filter(booking -> {
+                    LocalDateTime requestTime = booking.getTransferRequestTime();
+                    if (requestTime == null) return false;
+
+                    // Перевірка часу: якщо з моменту запиту пройшло менше 24 годин
+                    long hoursPassed = ChronoUnit.HOURS.between(requestTime, LocalDateTime.now());
+                    return hoursPassed <= 24;
+                })
+                .collect(Collectors.toList());
+    }
 
 
 }

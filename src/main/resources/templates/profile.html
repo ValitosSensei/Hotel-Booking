@@ -40,6 +40,7 @@
             <th>Room Number</th>
             <th>Check-in Date</th>
             <th>Check-out Date</th>
+            <th>Transfer</th>
             <th>Status</th>
         </tr>
         </thead>
@@ -54,6 +55,11 @@
                     <button type="submit">Скасувати</button>
                 </form>
                 <a th:href="@{/bookings/{bookingId}/transfer(bookingId=${booking.id})}">Передати</a>
+            </td>
+            <td>
+                <form th:action="@{/bookings/{bookingId}/request-transfer(bookingId=${booking.id})}" method="get">
+                    <button type="submit">Передати</button>
+                </form>
             </td>
             <td th:text="${booking.status}"></td>
             <td>

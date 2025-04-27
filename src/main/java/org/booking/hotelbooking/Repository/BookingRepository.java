@@ -24,4 +24,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("checkOut") LocalDate checkOut
     );
     Optional<Booking> findByConfirmationToken(String token);
+    Optional<Booking> findByTransferToken(String token);
+    List<Booking> findByTransferredToIsNotNull();
 }
