@@ -19,13 +19,23 @@ public class BookingScheduler {
         this.bookingService = bookingService;
     }
 
-    @Scheduled(fixedRate = 60000) // Перевірка кожну хвилину
+    @Scheduled(fixedRate = 60000)
     public void cancelExpiredBookings() {
         List<Booking> pendingBookings = bookingService.getPendingBookings();
         for (Booking booking : pendingBookings) {
-            long minutesPassed = ChronoUnit.MINUTES.between(booking.getCreatedAt(), LocalDateTime.now());
-            if (minutesPassed > 30) { // 30 хвилин на підтвердження
+            if (booking.getCreatedAt() == null) {
+
+                continue;
+            }
+
+            long minutesPassed = ChronoUnit.MINUTES.between(
+                    booking.getCreatedAt(),
+                    LocalDateTime.now()
+            );
+
+            if (minutesPassed > 30) {
                 bookingService.cancelBooking(booking.getId());
+
             }
         }
     }

@@ -1,6 +1,7 @@
 package org.booking.hotelbooking.Entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,12 +14,14 @@ public class Booking {
     private Long id;
 
     private LocalDateTime bookingDate;
+
     private LocalDate  checkInDate;
     private LocalDate  checkOutDate;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus status = BookingStatus.PENDING;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @ManyToOne

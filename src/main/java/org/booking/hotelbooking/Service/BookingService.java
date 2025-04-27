@@ -1,5 +1,6 @@
 package org.booking.hotelbooking.Service;
 
+import org.booking.hotelbooking.DTO.BookingRequest;
 import org.booking.hotelbooking.Entity.Booking;
 import org.booking.hotelbooking.Entity.BookingStatus;
 import org.booking.hotelbooking.Entity.Room;
@@ -72,7 +73,7 @@ public class BookingService {
         booking.setConfirmationToken(token);
 
         // Відправляємо email
-        String confirmationLink = "http://ваш-сайт/bookings/confirm?token=" + token;
+        String confirmationLink = "http://localhost:8080/bookings/confirm?token=" + token;
         emailService.sendConfirmationEmail(booking.getUser().getEmail(), confirmationLink);
 
         return bookingRepository.save(booking);
@@ -199,6 +200,40 @@ public class BookingService {
                     return hoursPassed <= 24;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Booking createBookingFromRequest(BookingRequest request, User user) {
+        Room room = roomService.getRoomById(request.getRoomId());
+
+        LocalDate currentDate = LocalDate.now();
+        if (request.getCheckInDate().isBefore(currentDate)) {
+            throw new RuntimeException("Дата заїзду не може бути в минулому");
+        }
+        if (request.getCheckOutDate().isBefore(request.getCheckInDate())) {
+            throw new RuntimeException("Дата виїзду має бути після дати заїзду");
+        }
+
+        if (!isRoomAvailable(room.getId(), request.getCheckInDate(), request.getCheckOutDate())) {
+            throw new RuntimeException("Кімната вже зайнята");
+        }
+
+        Booking booking = new Booking();
+        booking.setUser(user);
+        booking.setRoom(room);
+        booking.setCheckInDate(request.getCheckInDate());
+        booking.setCheckOutDate(request.getCheckOutDate());
+        booking.setStatus(BookingStatus.PENDING);
+        booking.setConfirmationToken(UUID.randomUUID().toString());
+        booking.setCreatedAt(LocalDateTime.now());
+
+        // Генерація посилання для підтвердження
+        String confirmationLink = "http://localhost:8080/bookings/confirm?token=" + booking.getConfirmationToken();
+
+        // Відправка листа
+        emailService.sendConfirmationEmail(user.getEmail(), confirmationLink);
+
+        return bookingRepository.save(booking);
     }
 
 

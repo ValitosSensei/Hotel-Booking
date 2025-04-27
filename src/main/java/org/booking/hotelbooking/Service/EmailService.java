@@ -2,6 +2,8 @@ package org.booking.hotelbooking.Service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,7 +14,7 @@ import java.security.Provider;
 
 @Service
 public class EmailService {
-
+    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
     private final JavaMailSender mailSender;
 
     @Autowired
@@ -21,6 +23,7 @@ public class EmailService {
     }
 
     public void sendConfirmationEmail(String toEmail, String confirmationLink) {
+
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
@@ -41,14 +44,16 @@ public class EmailService {
                     + "<a href='" + confirmationLink + "'>" + confirmationLink + "</a>"
                     + "</p>"
                     + "</div>";
-
             helper.setTo(toEmail);
             helper.setSubject("Підтвердження бронювання");
-            helper.setText(htmlContent, true); // true означає що це HTML
+            helper.setText(htmlContent, true);
             mailSender.send(message);
 
+            logger.info("Лист підтвердження надіслано на {}", toEmail);
+
         } catch (MessagingException e) {
-            throw new RuntimeException("Не вдалося надіслати лист підтвердження", e);
+            logger.error("Помилка відправки листа на {}: {}", toEmail, e.getMessage());
+            throw new RuntimeException("Не вдалося надіслати лист", e);
         }
     }
     public void sendTransferConfirmationEmail(String toEmail, String confirmationLink) {

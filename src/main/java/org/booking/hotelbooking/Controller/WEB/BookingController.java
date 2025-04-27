@@ -1,17 +1,25 @@
 package org.booking.hotelbooking.Controller.WEB;
 
+
+import org.booking.hotelbooking.DTO.BookingRequest;
 import org.booking.hotelbooking.Entity.*;
 import org.booking.hotelbooking.Service.BookingService;
 import org.booking.hotelbooking.Service.RoomService;
 import org.booking.hotelbooking.Service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Map;
 
 
 @Controller
@@ -21,57 +29,97 @@ public class BookingController {
     private final BookingService bookingService;
     private final RoomService roomService;
     private final UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(BookingController.class);
+
 
     @Autowired
     public BookingController(BookingService bookingService,
                              RoomService roomService,
-                             UserService userService) {
+                             UserService userService
+                             ) {
         this.bookingService = bookingService;
         this.roomService = roomService;
         this.userService = userService;
+
     }
 
-    @GetMapping("/rooms/{roomId}/book")
-    public String showBookingForm(@PathVariable Long roomId, Model model) {
-        Room room = roomService.getRoomById(roomId); // Завантажує Room з Hotel через @EntityGraph
-        if (room == null) {
-            throw new RuntimeException("Кімната не знайдена");
-        }
+//    @GetMapping("/rooms/{roomId}/book")
+//    public String showBookingForm(@PathVariable Long roomId, Model model) {
+//        Room room = roomService.getRoomById(roomId);
+//        if (room == null) {
+//            throw new RuntimeException("Кімната не знайдена");
+//        }
+//
+//        Booking booking = new Booking();
+//        booking.setRoom(room);
+//        model.addAttribute("booking", booking);
+//
+//        // Додаткові дані для модального вікна
+//        model.addAttribute("room", room);
+//        model.addAttribute("hotel", room.getHotel()); // Якщо потрібно передати готель
+//
+//        return "booking-form";
+//    }
 
-        Booking booking = new Booking();
-        booking.setRoom(room);
-        model.addAttribute("booking", booking);
-        return "booking-form";
-    }
+//    @PostMapping("/create")
+//    public String createBooking(
+//            @ModelAttribute("booking") Booking booking,
+//            BindingResult result,
+//            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
+//            RedirectAttributes redirectAttributes
+//    ) {
+//        if (securityUser == null) {
+//            redirectAttributes.addFlashAttribute("error", "Будь ласка, увійдіть в систему");
+//            return "redirect:/login";
+//        }
+//
+//        try {
+//            // Отримати повну сутність User з бази
+//            User user = userService.getUserByEmail(securityUser.getUsername());
+//            booking.setUser(user); // Прив'язати автентифікованого користувача
+//
+//            // Валідація дат
+//            if (booking.getCheckOutDate().isBefore(booking.getCheckInDate())) {
+//                redirectAttributes.addFlashAttribute("error", "Дата виїзду має бути після дати заїзду");
+//                return "redirect:/bookings/rooms/" + booking.getRoom().getId() + "/book";
+//            }
+//
+//            bookingService.createBooking(booking);
+//            return "redirect:/bookings/success";
+//        } catch (RuntimeException ex) {
+//            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+//            return "redirect:/bookings/rooms/" + booking.getRoom().getId() + "/book";
+//        }
+//    }
 
     @PostMapping("/create")
-    public String createBooking(
-            @ModelAttribute("booking") Booking booking,
-            BindingResult result,
-            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
-            RedirectAttributes redirectAttributes
+    @ResponseBody
+    public ResponseEntity<?> createBooking(
+            @RequestBody BookingRequest request,
+            @AuthenticationPrincipal UserDetails securityUser // securityUser буде null, якщо користувач не авторизований
     ) {
-        if (securityUser == null) {
-            redirectAttributes.addFlashAttribute("error", "Будь ласка, увійдіть в систему");
-            return "redirect:/login";
-        }
-
         try {
-            // Отримати повну сутність User з бази
-            User user = userService.getUserByEmail(securityUser.getUsername());
-            booking.setUser(user); // Прив'язати автентифікованого користувача
+            logger.info("Спроба бронювання: {}", request);
 
-            // Валідація дат
-            if (booking.getCheckOutDate().isBefore(booking.getCheckInDate())) {
-                redirectAttributes.addFlashAttribute("error", "Дата виїзду має бути після дати заїзду");
-                return "redirect:/bookings/rooms/" + booking.getRoom().getId() + "/book";
+            // Перевірка авторизації
+            if (securityUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                        "error", "Будь ласка, увійдіть в систему"
+                ));
             }
 
-            bookingService.createBooking(booking);
-            return "redirect:/bookings/success";
+            User user = userService.getUserByEmail(securityUser.getUsername());
+            Booking booking = bookingService.createBookingFromRequest(request, user);
+
+            return ResponseEntity.ok().body(Map.of(
+                    "success", true,
+                    "message", "Бронювання створено! Підтвердьте через email."
+            ));
         } catch (RuntimeException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
-            return "redirect:/bookings/rooms/" + booking.getRoom().getId() + "/book";
+            logger.error("Помилка бронювання: {}", ex.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", ex.getMessage()
+            ));
         }
     }
 
@@ -119,11 +167,12 @@ public class BookingController {
             RedirectAttributes redirectAttributes
     ) {
         try {
-            // Використовуйте bookingService замість bookingRepository
+            logger.info("Отримано токен підтвердження: {}", token);
             Booking booking = bookingService.findByConfirmationToken(token);
             bookingService.confirmBooking(booking.getId());
-            redirectAttributes.addFlashAttribute("success", "Бронювання підтверджено через email!");
+            redirectAttributes.addFlashAttribute("success", "Бронювання підтверджено!");
         } catch (RuntimeException ex) {
+            logger.error("Помилка підтвердження: {}", ex.getMessage());
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
         return "redirect:/profile";

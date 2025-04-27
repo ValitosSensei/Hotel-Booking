@@ -3,6 +3,28 @@
 <head>
     <title>Rooms in Hotel</title>
     <link rel="stylesheet" type="text/css" href="/room.css">
+    <link rel="stylesheet" href="/booking-form.css">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .booking-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
 </head>
 <body>
 
@@ -60,10 +82,18 @@
             <td>
                 <span th:text="${room.availableForDates ? 'Вільна' : 'Зайнята'}"></span>
             </td>
+
             <td>
-                <a th:if="${room.availableForDates}" th:href="@{/bookings/rooms/{roomId}/book(roomId=${room.id}, checkIn=${checkIn}, checkOut=${checkOut})}" class="button">Забронювати</a>
+                <button
+                        th:if="${room.availableForDates}"
+                        class="button book-button"
+                        th:attr="data-room-id=${room.id}"
+                        data-check-in="${checkIn}"
+                        data-check-out="${checkOut}"
+                >Забронювати</button>
                 <span th:unless="${room.availableForDates}">Недоступно</span>
             </td>
+
         </tr>
         </tbody>
     </table>
@@ -108,9 +138,121 @@
     </div>
 
 
+    <!-- Додайте цей блок для відображення повідомлень -->
+    <div id="booking-message" class="hidden"></div>
 
+    <!-- Модальне вікно -->
+    <div id="booking-modal" class="modal">
+        <div class="booking-container">
+            <span class="close-modal">&times;</span>
+            <h2>Бронювання кімнати</h2>
+            <form id="booking-form" method="post" class="booking-form">
+                <input type="hidden" id="room-id" name="roomId">
+
+
+                <div class="input-group">
+                    <label>Дата заїзду:</label>
+                    <input type="date" id="check-in" name="checkInDate" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Дата виїзду:</label>
+                    <input type="date" id="check-out" name="checkOutDate" required>
+                </div>
+
+                <button type="submit" class="button">Підтвердити бронювання</button>
+            </form>
+        </div>
+    </div>
     <a href="/" class="back-link">Back to Home</a>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById('booking-modal');
+        const bookingForm = document.getElementById('booking-form');
 
+        // Анімація для інпутів
+        document.querySelectorAll('#booking-form input').forEach(input => {
+            input.addEventListener("focus", () => {
+                input.style.borderColor = "#007bff";
+            });
+            input.addEventListener("blur", () => {
+                input.style.borderColor = "#ccc";
+            });
+        });
+
+        // Відкриття/закриття модального вікна
+        document.querySelectorAll('.book-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const roomId = parseInt(button.getAttribute('data-room-id'), 10); // Перетворення в число
+                document.getElementById('room-id').value = roomId;
+                modal.style.display = "flex";
+            });
+        });
+
+        document.querySelector('.close-modal').addEventListener('click', () => {
+            modal.style.display = "none";
+        });
+
+        // Відправка форми
+        bookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const checkIn = document.getElementById('check-in').value;
+            const checkOut = document.getElementById('check-out').value;
+            const currentDate = new Date().toISOString().split('T')[0]; // Поточна дата у форматі YYYY-MM-DD
+
+            // Валідація дат
+            if (checkIn < currentDate) {
+                alert("Дата заїзду не може бути в минулому");
+                return;
+            }
+            if (checkOut <= checkIn) {
+                alert("Дата виїзду має бути після дати заїзду");
+                return;
+            }
+            const formData = {
+                roomId: document.getElementById('room-id').value,
+                checkInDate: document.getElementById('check-in').value,
+                checkOutDate: document.getElementById('check-out').value
+            };
+
+            try {
+                const response = await fetch('/bookings/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest' // Важливий заголовок
+                    },
+                    body: JSON.stringify(formData),
+                    credentials: 'include' // Для передачі куків автентифікації
+                });
+
+                // Обробка HTTP-статусів
+                if (response.status === 401) {
+                    alert("Будь ласка, увійдіть в систему.");
+                    window.location.href = "/login";
+                    return;
+                }
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || "Помилка сервера");
+                }
+
+                const result = await response.json();
+                alert(result.message);
+                modal.style.display = "none";
+                window.location.reload();
+
+            } catch (error) {
+                console.error('Помилка:', error);
+                alert("Помилка: " + error.message);
+            }
+        });
+    });
+
+</script>
 </body>
 </html>

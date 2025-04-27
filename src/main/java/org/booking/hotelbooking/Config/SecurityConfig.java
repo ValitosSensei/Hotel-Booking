@@ -4,8 +4,10 @@ import org.booking.hotelbooking.Entity.User;
 import org.booking.hotelbooking.Service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +21,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/{hotelId}/reviews").authenticated() // Вимагає авторизації
+                        .requestMatchers("/{hotelId}/reviews").authenticated()
+                        .requestMatchers("/bookings/create").authenticated() // Дозвіл для бронювань
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
@@ -42,7 +45,14 @@ public class SecurityConfig {
                         .maximumSessions(1)
                         .expiredUrl("/login?expired=true")
                 )
-                .csrf(csrf -> csrf.disable()); // Вимкнути CSRF (зручно для тестів, небезпечно в продакшені)
+
+                // Вимкнення CSRF для API-запитів
+                .csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized");
+                        })
+                );
 
         return http.build();
     }
@@ -64,6 +74,6 @@ public class SecurityConfig {
     @Bean
     @SuppressWarnings("deprecation")
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance(); // Без шифрування (тільки на час розробки!)
+        return NoOpPasswordEncoder.getInstance();
     }
 }
