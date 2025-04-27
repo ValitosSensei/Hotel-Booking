@@ -55,6 +55,13 @@
                 </form>
                 <a th:href="@{/bookings/{bookingId}/transfer(bookingId=${booking.id})}">Передати</a>
             </td>
+            <td th:text="${booking.status}"></td>
+            <td>
+                <form th:if="${booking.status == T(org.booking.hotelbooking.Entity.BookingStatus).PENDING}"
+                      th:action="@{/bookings/{bookingId}/confirm(bookingId=${booking.id})}" method="post">
+                    <button type="submit">Підтвердити</button>
+                </form>
+            </td>
             <td>
                 <span th:if="${booking.transferredFrom != null}">
                      Передано від: <span th:text="${booking.transferredFrom.email}"></span>

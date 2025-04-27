@@ -111,4 +111,18 @@ public class BookingController {
         }
         return "redirect:/profile";
     }
+
+    @PostMapping("/{bookingId}/confirm")
+    public String confirmBooking(
+            @PathVariable Long bookingId,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            bookingService.confirmBooking(bookingId);
+            redirectAttributes.addFlashAttribute("success", "Бронювання підтверджено");
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/profile";
+    }
 }

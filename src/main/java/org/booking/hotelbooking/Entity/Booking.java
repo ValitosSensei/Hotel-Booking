@@ -17,7 +17,10 @@ public class Booking {
     private LocalDate  checkOutDate;
 
     @Enumerated(EnumType.STRING)
-    private BookingStatus status = BookingStatus.CONFIRMED;
+    private BookingStatus status = BookingStatus.PENDING;
+
+    private LocalDateTime createdAt;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -36,16 +39,27 @@ public class Booking {
 
     public Booking() {}
 
-    public Booking(Long id, LocalDateTime bookingDate, LocalDate checkInDate, LocalDate checkOutDate, BookingStatus status, User user, Room room, User transferredFrom, User transferredTo) {
+    public Booking(Long id, LocalDateTime bookingDate, LocalDate checkInDate,
+                   LocalDate checkOutDate, BookingStatus status, LocalDateTime createdAt,
+                   User user, Room room, User transferredFrom, User transferredTo) {
         this.id = id;
         this.bookingDate = bookingDate;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
         this.status = status;
+        this.createdAt = createdAt;
         this.user = user;
         this.room = room;
         this.transferredFrom = transferredFrom;
         this.transferredTo = transferredTo;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public User getTransferredFrom() {

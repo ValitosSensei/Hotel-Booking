@@ -1,6 +1,7 @@
 package org.booking.hotelbooking.Service;
 
 import org.booking.hotelbooking.Entity.Booking;
+import org.booking.hotelbooking.Entity.BookingStatus;
 import org.booking.hotelbooking.Entity.Room;
 import org.booking.hotelbooking.Entity.User;
 import org.booking.hotelbooking.Repository.BookingRepository;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class BookingService {
@@ -42,13 +45,18 @@ public class BookingService {
             throw new RuntimeException("Кімната не знайдена");
         }
 
-        if (!roomService.isRoomAvailable(booking.getRoom().getId(), booking.getCheckInDate(), booking.getCheckOutDate())) {
+        // Замінити цей рядок:
+        // if (!roomService.isRoomAvailable(booking.getRoom().getId(), booking.getCheckInDate(), booking.getCheckOutDate())) {
+
+        // На цей:
+        if (!isRoomAvailable(booking.getRoom().getId(), booking.getCheckInDate(), booking.getCheckOutDate())) {
             throw new RuntimeException("Кімната вже зайнята на ці дати");
         }
 
         // Прив'язуємо завантажену кімнату до бронювання
         booking.setRoom(room);
-
+        booking.setStatus(BookingStatus.PENDING);
+        booking.setCreatedAt(LocalDateTime.now());
 
         roomRepository.save(room);
 
@@ -87,6 +95,30 @@ public class BookingService {
         userService.saveUser(currentUser);
         userService.saveUser(newUser);
     }
+
+    @Transactional
+    public void confirmBooking(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Бронювання не знайдено"));
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+    }
+
+    public List<Booking> getPendingBookings() {
+        return bookingRepository.findByStatus(BookingStatus.PENDING);
+    }
+
+    public boolean isRoomAvailable(Long roomId, LocalDate checkInDate, LocalDate checkOutDate) {
+        List<Booking> overlappingBookings = bookingRepository.findByRoomIdAndStatus(
+                roomId,
+                BookingStatus.CONFIRMED,
+                checkInDate,
+                checkOutDate
+        );
+        return overlappingBookings.isEmpty();
+    }
+
+
 
 
 }
