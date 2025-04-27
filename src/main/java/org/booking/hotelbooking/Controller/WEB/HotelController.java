@@ -165,10 +165,15 @@ public class HotelController {
             Principal principal, // Для отримання поточного користувача
             RedirectAttributes redirectAttributes
     ) {
+        if (principal == null) {
+            redirectAttributes.addFlashAttribute("error", "Ви повинні бути авторизовані для того, щоб залишити відгук.");
+            return "redirect:/{hotelId}/rooms";
+        }
+
         User user = userService.getUserByEmail(principal.getName());
         Hotel hotel = hotelService.getHotelById(hotelId);
 
-        // Перевірка, чи користувач має бронювання в цьому готелі (додайте логіку за потребою)
+        // Перевірка, чи користувач має бронювання в цьому готелі
         // if (!bookingService.hasUserBookedHotel(user, hotel)) {
         //     redirectAttributes.addFlashAttribute("error", "Ви не можете залишити відгук без бронювання");
         //     return "redirect:/{hotelId}/rooms";

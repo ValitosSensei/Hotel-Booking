@@ -1,0 +1,269 @@
+/* Загальні стилі */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    font-size: 2em;
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Логотип і навігація */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #007BFF;
+    color: white;
+}
+
+.logo a {
+    display: block;
+}
+
+.logo img {
+    width: 150px; /* Більший розмір логотипа */
+    height: auto;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+}
+
+nav a {
+    text-decoration: none;
+    color: white;
+    font-size: 1.2em;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #ffcc00;
+}
+
+.profile-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.profile-button i {
+    margin-right: 8px;
+}
+
+/* Форма фільтрації */
+.filter-form {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+.filter-form div {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.filter-form input, .filter-form select {
+    padding: 8px;
+    font-size: 1em;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.filter-form button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-form button:hover {
+    background-color: #45a049;
+}
+
+/* Таблиця кімнат */
+.rooms-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.rooms-table th, .rooms-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.room-row:hover {
+    background-color: #f1f1f1;
+    transition: background-color 0.3s;
+}
+
+/* Кнопка бронювання */
+.button {
+    background-color: #007BFF;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+/* Форма відгуків */
+.review-form {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.review-form h2 {
+    margin-bottom: 10px;
+}
+
+/* Відгуки */
+.review {
+    margin-bottom: 20px;
+}
+
+.review p {
+    margin: 5px 0;
+}
+
+/* Повернутися на головну */
+.back-link {
+    display: block;
+    text-align: center;
+    margin-top: 30px;
+    font-size: 1.2em;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Анімації */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+/* Стилі для зіркової оцінки */
+.star-rating {
+    direction: rtl;
+    display: inline-block;
+    font-size: 2em;
+}
+
+.star-rating input[type="radio"] {
+    display: none;
+}
+
+.star-rating label {
+    color: #ccc; /* Початковий колір зірки */
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.star-rating input[type="radio"]:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #ffcc00; /* Золотий колір для вибраної зірки */
+}
+
+.star-rating input[type="radio"]:checked ~ label {
+    color: #ffcc00; /* Колір для вибраної зірки */
+}
+
+.star-rating label:hover {
+    color: #ffcc00; /* Колір зірки при наведенні */
+}
+
+/* Поле для коментарів */
+.comment-textarea {
+    width: 100%;
+    height: 150px;
+    padding: 12px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    resize: none;
+    margin-top: 10px;
+    transition: border-color 0.3s ease;
+}
+
+.comment-textarea:focus {
+    border-color: #4CAF50; /* Колір при фокусі */
+}
+
+/* Загальний стиль для форми відгуку */
+.review-form h2 {
+    margin-bottom: 10px;
+    font-size: 1.5em;
+}
+
+.review-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.review-form label {
+    font-weight: bold;
+}
+
+.review-form button {
+    align-self: flex-start;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.review-form button:hover {
+    background-color: #0056b3;
+}

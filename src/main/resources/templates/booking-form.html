@@ -1,31 +1,49 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Бронювання кімнати</title>
+    <link rel="stylesheet" href="/booking-form.css">
 </head>
 <body>
-<h1>Бронювання кімнати №<span th:text="${booking.room.roomNumber}"></span></h1>
+<div class="booking-container">
+    <h1>Бронювання кімнати №<span th:text="${booking.room.roomNumber}"></span></h1>
 
-<div th:if="${error}" style="color:red">
-    <p th:text="${error}"></p>
+    <div th:if="${error}" class="error-message">
+        <p th:text="${error}"></p>
+    </div>
+
+    <form th:action="@{/bookings/create}" th:object="${booking}" method="post" class="booking-form">
+        <input type="hidden" th:field="*{room.id}"/>
+
+        <div class="input-group">
+            <label>Дата заїзду:</label>
+            <input type="date" th:field="*{checkInDate}" required>
+        </div>
+
+        <div class="input-group">
+            <label>Дата виїзду:</label>
+            <input type="date" th:field="*{checkOutDate}" required>
+        </div>
+
+        <button type="submit">Підтвердити бронювання</button>
+    </form>
 </div>
 
-<form th:action="@{/bookings/create}" th:object="${booking}" method="post">
-    <input type="hidden" th:field="*{room.id}"/>
-
-
-
-    <div>
-        <label>Дата заїзду:</label>
-        <input type="date" th:field="*{checkInDate}" required>
-    </div>
-
-    <div>
-        <label>Дата виїзду:</label>
-        <input type="date" th:field="*{checkOutDate}" required>
-    </div>
-
-    <button type="submit">Підтвердити бронювання</button>
-</form>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const formElements = document.querySelectorAll(".booking-form input");
+        formElements.forEach(input => {
+            input.addEventListener("focus", () => {
+                input.style.borderColor = "#007bff";
+            });
+            input.addEventListener("blur", () => {
+                input.style.borderColor = "#ccc";
+            });
+        });
+    });
+</script>
 </body>
 </html>
