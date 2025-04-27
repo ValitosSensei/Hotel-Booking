@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class BookingService {
@@ -23,15 +24,20 @@ public class BookingService {
     private final RoomService roomService;
     private static final Logger logger = LoggerFactory.getLogger(BookingService.class);
     private final RoomRepository roomRepository;
+    private final EmailService emailService;
 
 
     @Autowired
     public BookingService(BookingRepository bookingRepository,
-                          UserService userService, RoomService roomService, RoomRepository roomRepository) {
+                          UserService userService,
+                          RoomService roomService,
+                          RoomRepository roomRepository,
+                          EmailService emailService) {
         this.bookingRepository = bookingRepository;
         this.userService = userService;
         this.roomService = roomService;
         this.roomRepository = roomRepository;
+        this.emailService = emailService;
     }
     @Transactional
     public Booking createBooking(Booking booking) {
@@ -59,6 +65,13 @@ public class BookingService {
         booking.setCreatedAt(LocalDateTime.now());
 
         roomRepository.save(room);
+
+        String token = UUID.randomUUID().toString();
+        booking.setConfirmationToken(token);
+
+        // Відправляємо email
+        String confirmationLink = "http://ваш-сайт/bookings/confirm?token=" + token;
+        emailService.sendConfirmationEmail(booking.getUser().getEmail(), confirmationLink);
 
         return bookingRepository.save(booking);
     }
@@ -116,6 +129,11 @@ public class BookingService {
                 checkOutDate
         );
         return overlappingBookings.isEmpty();
+    }
+
+    public Booking findByConfirmationToken(String token) {
+        return bookingRepository.findByConfirmationToken(token)
+                .orElseThrow(() -> new RuntimeException("Невірний токен"));
     }
 
 

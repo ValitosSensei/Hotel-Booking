@@ -37,11 +37,14 @@ public class Booking {
     @JoinColumn(name = "transferred_to_id")
     private User transferredTo;
 
+    private String confirmationToken;
+
     public Booking() {}
 
     public Booking(Long id, LocalDateTime bookingDate, LocalDate checkInDate,
                    LocalDate checkOutDate, BookingStatus status, LocalDateTime createdAt,
-                   User user, Room room, User transferredFrom, User transferredTo) {
+                   User user, Room room, User transferredFrom, User transferredTo,
+                   String confirmationToken) {
         this.id = id;
         this.bookingDate = bookingDate;
         this.checkInDate = checkInDate;
@@ -52,6 +55,15 @@ public class Booking {
         this.room = room;
         this.transferredFrom = transferredFrom;
         this.transferredTo = transferredTo;
+        this.confirmationToken = confirmationToken;
+    }
+
+    public String getConfirmationToken() {
+        return confirmationToken;
+    }
+
+    public void setConfirmationToken(String confirmationToken) {
+        this.confirmationToken = confirmationToken;
     }
 
     public LocalDateTime getCreatedAt() {

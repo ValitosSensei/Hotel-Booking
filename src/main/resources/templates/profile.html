@@ -59,7 +59,7 @@
             <td>
                 <form th:if="${booking.status == T(org.booking.hotelbooking.Entity.BookingStatus).PENDING}"
                       th:action="@{/bookings/{bookingId}/confirm(bookingId=${booking.id})}" method="post">
-                    <button type="submit">Підтвердити</button>
+                    <button type="submit">Підтвердити через кнопку</button>
                 </form>
             </td>
             <td>

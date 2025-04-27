@@ -112,14 +112,32 @@ public class BookingController {
         return "redirect:/profile";
     }
 
+    // Підтвердження через токен (email)
+    @GetMapping("/confirm")
+    public String confirmBookingByToken(
+            @RequestParam String token,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            // Використовуйте bookingService замість bookingRepository
+            Booking booking = bookingService.findByConfirmationToken(token);
+            bookingService.confirmBooking(booking.getId());
+            redirectAttributes.addFlashAttribute("success", "Бронювання підтверджено через email!");
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/profile";
+    }
+
+    // Підтвердження через кнопку (для тестування)
     @PostMapping("/{bookingId}/confirm")
-    public String confirmBooking(
+    public String confirmBookingByButton(
             @PathVariable Long bookingId,
             RedirectAttributes redirectAttributes
     ) {
         try {
             bookingService.confirmBooking(bookingId);
-            redirectAttributes.addFlashAttribute("success", "Бронювання підтверджено");
+            redirectAttributes.addFlashAttribute("success", "Бронювання підтверджено через кнопку!");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
