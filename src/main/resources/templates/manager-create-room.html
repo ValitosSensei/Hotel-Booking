@@ -14,7 +14,7 @@
     <p>Тип кімнати: <input type="text" th:field="*{type}" required></p>
     <p>Ціна: <input type="number" th:field="*{price}" step="0.01" required></p>
     <p>Доступність:
-        <select th:field="*{available}">
+        <select th:field="*{availableForDates}">
             <option th:value="true">Доступна</option>
             <option th:value="false">Недоступна</option>
         </select>

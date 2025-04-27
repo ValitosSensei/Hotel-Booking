@@ -149,34 +149,48 @@ public class ManagerController {
         return "redirect:/manager/hotels/{hotelId}";
     }
 
-//    @GetMapping("/create-hotel")
-//    public String showCreateHotelForm(
-//            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
-//            Model model
-//    ) {
-//        User user = userService.getUserByEmail(securityUser.getUsername());
-//        CreateHotelWithRoomsDTO dto = new CreateHotelWithRoomsDTO();
-//        dto.getRooms().add(new CreateRoomDTO());
-//        model.addAttribute("hotelDTO", dto);
-//        model.addAttribute("userId", user.getId());
-//        return "create-hotel";
-//    }
-//
-//    @PostMapping("/create-hotel")
-//    public String createHotel(
-//            @ModelAttribute("hotelDTO") CreateHotelWithRoomsDTO hotelDTO,
-//            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
-//            RedirectAttributes redirectAttributes
-//    ) {
-//        User user = userService.getUserByEmail(securityUser.getUsername());
-//        hotelDTO.setUserId(user.getId()); // Автоматично встановлюємо ID менеджера
-//
-//        try {
-//            hotelService.createHotelWithRooms(hotelDTO);
-//            redirectAttributes.addFlashAttribute("success", "Готель створено!");
-//        } catch (RuntimeException ex) {
-//            redirectAttributes.addFlashAttribute("error", ex.getMessage());
-//        }
-//        return "redirect:/profile";
-//    }
+    @GetMapping("/create-hotel")
+    public String showCreateHotelForm(
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
+            Model model
+    ) {
+        User user = userService.getUserByEmail(securityUser.getUsername());
+        CreateHotelWithRoomsDTO dto = new CreateHotelWithRoomsDTO();
+        dto.getRooms().add(new CreateRoomDTO());
+        model.addAttribute("hotelDTO", dto);
+        model.addAttribute("userId", user.getId());
+        return "create-hotel";
+    }
+
+    @PostMapping("/create-hotel")
+    public String createHotel(
+            @ModelAttribute("hotelDTO") CreateHotelWithRoomsDTO hotelDTO,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
+            RedirectAttributes redirectAttributes
+    ) {
+        // Перевірка автентифікації
+        if (securityUser == null) {
+            redirectAttributes.addFlashAttribute("error", "Будь ласка, увійдіть у систему");
+            return "redirect:/login";
+        }
+
+        // Отримання користувача
+        User user = userService.getUserByEmail(securityUser.getUsername());
+        if (user == null) {
+            redirectAttributes.addFlashAttribute("error", "Користувач не знайдений");
+            return "redirect:/profile";
+        }
+
+        // Встановлення userId
+        hotelDTO.setUserId(user.getId());
+        System.out.println("Переданий userId: " + hotelDTO.getUserId()); // Логування
+
+        try {
+            hotelService.createHotelWithRooms(hotelDTO);
+            redirectAttributes.addFlashAttribute("success", "Готель створено!");
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/profile";
+    }
 }

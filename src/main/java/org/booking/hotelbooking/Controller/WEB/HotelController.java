@@ -114,48 +114,48 @@ public class HotelController {
             return "error";
         }
     }
-    @GetMapping("/create")
-    public String showCreateForm(Model model) {
-        CreateHotelWithRoomsDTO dto = new CreateHotelWithRoomsDTO();
-
-        dto.getRooms().add(new CreateRoomDTO());
-        model.addAttribute("hotelDTO", dto);
-        return "create-hotel";
-    }
-
-    @PostMapping("/create")
-    public String createHotel(
-            @ModelAttribute("hotelDTO") CreateHotelWithRoomsDTO hotelDTO,
-            BindingResult result,
-            RedirectAttributes redirectAttributes
-    ) {
-        if (result.hasErrors()) {
-            return "create-hotel";
-        }
-
-        try {
-            // Отримуємо користувача за ID
-            User user = userService.getUserById(hotelDTO.getUserId());
-
-            // Перевіряємо ролі
-            Set<Role> userRoles = user.getRoles();
-            boolean isAllowed = userRoles.contains(Role.ROLE_ADMIN) || userRoles.contains(Role.ROLE_MANAGER);
-
-            if (!isAllowed) {
-                redirectAttributes.addFlashAttribute("error", "Тільки адміністратори та менеджери можуть створювати готелі");
-                return "redirect:/create";
-            }
-
-            // Якщо перевірка успішна - створюємо готель
-            hotelService.createHotelWithRooms(hotelDTO);
-            redirectAttributes.addFlashAttribute("success", "Готель створено");
-        } catch (RuntimeException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
-            return "redirect:/create";
-        }
-
-        return "redirect:/";
-    }
+//    @GetMapping("/create")
+//    public String showCreateForm(Model model) {
+//        CreateHotelWithRoomsDTO dto = new CreateHotelWithRoomsDTO();
+//
+//        dto.getRooms().add(new CreateRoomDTO());
+//        model.addAttribute("hotelDTO", dto);
+//        return "create-hotel";
+//    }
+//
+//    @PostMapping("/create")
+//    public String createHotel(
+//            @ModelAttribute("hotelDTO") CreateHotelWithRoomsDTO hotelDTO,
+//            BindingResult result,
+//            RedirectAttributes redirectAttributes
+//    ) {
+//        if (result.hasErrors()) {
+//            return "create-hotel";
+//        }
+//
+//        try {
+//            // Отримуємо користувача за ID
+//            User user = userService.getUserById(hotelDTO.getUserId());
+//
+//            // Перевіряємо ролі
+//            Set<Role> userRoles = user.getRoles();
+//            boolean isAllowed = userRoles.contains(Role.ROLE_ADMIN) || userRoles.contains(Role.ROLE_MANAGER);
+//
+//            if (!isAllowed) {
+//                redirectAttributes.addFlashAttribute("error", "Тільки адміністратори та менеджери можуть створювати готелі");
+//                return "redirect:/create";
+//            }
+//
+//            // Якщо перевірка успішна - створюємо готель
+//            hotelService.createHotelWithRooms(hotelDTO);
+//            redirectAttributes.addFlashAttribute("success", "Готель створено");
+//        } catch (RuntimeException ex) {
+//            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+//            return "redirect:/create";
+//        }
+//
+//        return "redirect:/";
+//    }
 
     @PostMapping("/{hotelId}/reviews")
     public String submitReview(

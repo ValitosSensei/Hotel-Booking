@@ -44,7 +44,7 @@
       <td th:text="${room.roomNumber}">101</td>
       <td th:text="${room.type}">Стандарт</td>
       <td th:text="${room.price}">1000</td>
-      <td th:text="${room.available ? 'Так' : 'Ні'}">Так</td>
+      <td th:text="${room.isAvailableForDates() ? 'Так' : 'Ні'}">Так</td>
       <td>
         <a th:href="@{/manager/editRoom/{roomId}(roomId=${room.id})}">Редагувати</a>
       </td>

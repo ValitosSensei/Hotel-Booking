@@ -38,7 +38,7 @@ public class HotelService {
     @Transactional
     public void createHotelWithRooms(CreateHotelWithRoomsDTO dto) {
         User manager = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new RuntimeException("User Not Found"));
+                .orElseThrow(() -> new RuntimeException("Користувача не знайдено"));
 
         Hotel hotel = new Hotel();
         hotel.setName(dto.getName());
@@ -48,22 +48,24 @@ public class HotelService {
         hotel.setContactInfo(dto.getContactInfo());
         hotel.setOwner(manager);
 
-        hotel = hotelRepository.save(hotel); // Зберегти готель перед додаванням кімнат
+        Hotel savedHotel = hotelRepository.save(hotel);
 
-        Hotel savedHotel = hotel; // створюємо effectively final змінну для використання в лямбді
+        // Збереження кімнат
+        List<Room> rooms = dto.getRooms().stream()
+                .map(roomDTO -> {
+                    Room room = new Room();
+                    room.setHotel(savedHotel);
+                    room.setRoomNumber(roomDTO.getRoomNumber());
+                    room.setType(roomDTO.getType());
+                    room.setPrice(roomDTO.getPrice());
+                    room.setAvailableForDates(roomDTO.isAvailableForDates());
+                    return room;
+                })
+                .collect(Collectors.toList());
 
-        List<Room> rooms = dto.getRooms().stream().map(roomDTO -> {
-            Room room = new Room();
-            room.setHotel(savedHotel); // використовуємо savedHotel
-            room.setRoomNumber(roomDTO.getRoomNumber());
-            room.setType(roomDTO.getType());
-            room.setPrice(roomDTO.getPrice());
-            room.setAvailableForDates(roomDTO.isAvailableForDates());
-            return room;
-        }).collect(Collectors.toList());
-
-        hotel.setRooms(rooms);
-        hotelRepository.save(hotel); // Оновити готель з кімнатами
+        roomRepository.saveAll(rooms);
+        savedHotel.setRooms(rooms);
+        hotelRepository.save(savedHotel);
     }
 
     public List<String> getAllCities() {

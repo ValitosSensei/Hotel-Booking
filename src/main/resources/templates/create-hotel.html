@@ -9,8 +9,8 @@
 
 <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-<form th:action="@{/create}" th:object="${hotelDTO}" method="post">
-
+<form th:action="@{/manager/create-hotel}" th:object="${hotelDTO}" method="post">
+    <input type="hidden" th:field="*{userId}" />
     <label>Назва:</label>
     <input type="text" th:field="*{name}" required/><br/>
 
@@ -29,6 +29,7 @@
     <h3>Кімнати</h3>
     <div id="rooms">
         <div th:each="room, iStat : *{rooms}">
+
             <label>Номер кімнати:</label>
             <input type="text" th:field="*{rooms[__${iStat.index}__].roomNumber}" required/><br/>
 
