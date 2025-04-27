@@ -1,0 +1,216 @@
+/* Загальні стилі */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    overflow-x: hidden;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+    color: #16a085;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Бокова панель */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 1000;
+}
+
+.nav-tabs {
+    width: 250px;
+    height: 100%;
+    background: linear-gradient(180deg, #2c3e50, #34495e);
+    box-shadow: 3px 0 15px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+    transform: translateX(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-tabs:hover {
+    transform: translateX(0);
+}
+
+.tab-link {
+    padding: 18px 25px;
+    margin: 8px 15px;
+    color: #ecf0f1;
+    font-size: 1.1em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.tab-link::before {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.1);
+    transition: left 0.4s;
+}
+
+.tab-link:hover::before {
+    left: 0;
+}
+
+.tab-link.active {
+    background: #16a085;
+    transform: translateX(10px);
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+}
+
+.tab-link i {
+    margin-right: 12px;
+    font-size: 1.2em;
+}
+
+/* Кнопка повернення */
+.home-button {
+    display: block;
+    padding: 15px 25px;
+    margin: 20px;
+    background: #e74c3c;
+    color: white;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.home-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+    color: white;
+}
+
+/* Вміст */
+.tab-content {
+    margin-left: 270px;
+    padding: 30px;
+    min-height: 100vh;
+    opacity: 0;
+    transform: translateX(30px);
+    animation: slideIn 0.6s forwards;
+    background: white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-radius: 15px 0 0 15px;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Кнопки */
+button {
+    background-color: #16a085;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #1abc9c;
+}
+
+a {
+    text-decoration: none;
+    color: #16a085;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #1abc9c;
+}
+
+/* Стилі таблиць */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #ecf0f1;
+}
+
+/* Форма пошуку користувачів */
+.user-search-form {
+    margin-bottom: 20px;
+}
+
+.user-search-form input {
+    padding: 10px;
+    width: 200px;
+    margin-right: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.user-search-form button {
+    padding: 10px 20px;
+    background-color: #16a085;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.user-search-form button:hover {
+    background-color: #1abc9c;
+}
+
+/* Стилі для таблиці користувачів */
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-table th, .user-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.user-table th {
+    background-color: #ecf0f1;
+}
+
+/* Синхронізація */
+#syncResult {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}

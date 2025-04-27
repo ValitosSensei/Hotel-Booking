@@ -23,22 +23,37 @@
                 ratingFilterDiv.style.display = "block"; // Показуємо фільтри
             }
         }
+        function toggleMenu() {
+            const nav = document.querySelector('nav ul');
+            nav.classList.toggle('active');
+
+            // Закривати меню при кліку поза ним
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('nav') && !e.target.closest('.menu-toggle')) {
+                    nav.classList.remove('active');
+                }
+            });
+        }
 
         // Викликаємо функцію при завантаженні сторінки та при зміні міста
         window.onload = toggleFilter;
     </script>
 </head>
 <body>
+
 <div class="container">
     <header>
         <h1>Welcome to the Hotel Booking System</h1>
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
         <nav>
             <ul>
-                <li><a href="/register">Register</a></li>
-                <li><a href="/login">Login</a></li>
-                <li><a href="/profile">View Profile</a></li>
-                <li><a href="/create">Create Hotel</a></li>
-                <li><a href="/admin">Admin Panel</a></li>
+                <li><a href="/register"><i class="fas fa-user-plus"></i>Реєстрація</a></li>
+                <li><a href="/login"><i class="fas fa-sign-in-alt"></i>Вхід</a></li>
+                <li><a href="/profile"><i class="fas fa-user-circle"></i>Профіль</a></li>
+                <li><a href="/create"><i class="fas fa-plus-circle"></i>Створити</a></li>
+                <li><a href="/admin"><i class="fas fa-lock"></i>Адмінка</a></li>
             </ul>
         </nav>
     </header>
@@ -71,7 +86,9 @@
                 </div>
             </div>
 
-            <button type="submit">Filter</button>
+            <div class="filter-button-container">
+                <button type="submit">🔍 Застосувати фільтри</button>
+            </div>
         </form>
 
         <section>

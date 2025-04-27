@@ -1,68 +1,67 @@
-<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        .nav-tabs {
-            display: flex;
-            cursor: pointer;
-        }
-        .nav-tabs div {
-            margin-right: 20px;
-            padding: 10px 20px;
-            background-color: #f1f1f1;
-        }
-        .nav-tabs .active {
-            background-color: #007bff;
-            color: white;
-        }
-        .tab-content {
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="/admin-panel.css">
 </head>
 <body>
-<h1>Admin Panel</h1>
+<h1>🏨 Admin Dashboard</h1>
 
-<!-- Навігаційні вкладки -->
-<div class="nav-tabs">
-    <div class="tab-link active" data-tab="hotels">Hotels</div>
-    <div class="tab-link" data-tab="rooms">Rooms</div>
-    <div class="tab-link" data-tab="requests">Запити</div>
-    <div class="tab-link" data-tab="sync">Синхронізація готелів</div>
-</div>
-<p><a href="/">Back to Home</a></p>
-
-<!-- Вкладка з готелями -->
-<div id="hotels" class="tab-content">
-    <h2>Manage Hotels</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>Hotel Name</th>
-            <th>City</th>
-            <th>Country</th>
-            <th>Average Rating</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="hotel : ${hotels}">
-            <td th:text="${hotel.name}"></td>
-            <td th:text="${hotel.city}"></td>
-            <td th:text="${hotel.country}"></td>
-            <td th:text="${hotel.averageRating}"></td>
-            <td>
-                <a th:href="@{/admin/editHotel/{hotelId}(hotelId=${hotel.id})}">Edit</a> |
-                <a th:href="@{/admin/deleteHotel/{hotelId}(hotelId=${hotel.id})}">Delete</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="nav-tabs">
+        <a href="/" class="home-button">
+            <i class="fas fa-arrow-left"></i> Головна
+        </a>
+        <div class="tab-link active" data-tab="hotels">
+            <i class="fas fa-hotel"></i> Готелі
+        </div>
+        <div class="tab-link" data-tab="rooms">
+            <i class="fas fa-bed"></i> Кімнати
+        </div>
+        <div class="tab-link" data-tab="users">
+            <i class="fas fa-users"></i> Користувачі
+        </div>
+        <div class="tab-link" data-tab="requests">
+            <i class="fas fa-envelope"></i> Запити
+        </div>
+        <div class="tab-link" data-tab="sync">
+            <i class="fas fa-sync-alt"></i> Синхронізація
+        </div>
+    </div>
 </div>
 
-<!-- Вкладка з кімнатами -->
+<!-- Main Content -->
+<div class="content">
+    <div id="hotels" class="tab-content">
+        <h2>Manage Hotels</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Hotel Name</th>
+                <th>City</th>
+                <th>Country</th>
+                <th>Average Rating</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="hotel : ${hotels}">
+                <td th:text="${hotel.name}"></td>
+                <td th:text="${hotel.city}"></td>
+                <td th:text="${hotel.country}"></td>
+                <td th:text="${hotel.averageRating}"></td>
+                <td>
+                    <a th:href="@{/admin/editHotel/{hotelId}(hotelId=${hotel.id})}">Edit</a> |
+                    <a th:href="@{/admin/deleteHotel/{hotelId}(hotelId=${hotel.id})}">Delete</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Rooms tab -->
 <div id="rooms" class="tab-content" style="display: none;">
     <h2>Manage Rooms</h2>
     <table>
@@ -82,22 +81,54 @@
             <td>
                 <a th:href="@{/admin/editRoom/{roomId}(roomId=${room.id})}">Edit</a> |
                 <a th:href="@{/admin/deleteRoom/{roomId}(roomId=${room.id})}">Delete</a>
-
             </td>
         </tr>
         </tbody>
     </table>
 </div>
 
-<!-- Вміст вкладки -->
+<!-- Users tab -->
+<div id="users" class="tab-content" style="display: none;">
+    <div th:fragment="users"> <!-- Додано th:fragment -->
+        <h2>Manage Users</h2>
+        <form id="userSearchForm" class="user-search-form" th:action="@{/admin/searchUser}" method="get">
+            <input type="email" name="email" placeholder="Search by email..." required>
+            <button type="submit">Search</button>
+        </form>
+        <table class="user-table">
+            <thead>
+            <tr>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${searchedUsers}">
+                <td th:text="${user.email}"></td>
+                <td>
+                    <span th:each="role : ${user.roles}" th:text="${role} + ' '"></span>
+                </td>
+                <td>
+                    <form th:action="@{/admin/grant-admin/{userId}(userId=${user.id})}" method="post">
+                        <button type="submit">Grant Admin</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Requests tab -->
 <div id="requests" class="tab-content" style="display: none;">
-    <h2>Запити на роль менеджера</h2>
-    <table border="1">
+    <h2>Manager Role Requests</h2>
+    <table>
         <thead>
         <tr>
-            <th>Користувач</th>
-            <th>Дата запиту</th>
-            <th>Дії</th>
+            <th>User</th>
+            <th>Request Date</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -106,70 +137,96 @@
             <td th:text="${#temporals.format(request.requestDate, 'dd-MM-yyyy HH:mm')}"></td>
             <td>
                 <form th:action="@{/admin/approve-request/{id}(id=${request.id})}" method="post">
-                    <button type="submit">Схвалити</button>
+                    <button type="submit">Approve</button>
                 </form>
             </td>
         </tr>
         </tbody>
     </table>
 </div>
+
+<!-- Synchronization tab -->
 <div id="sync" class="tab-content" style="display: none;">
-    <h2>Синхронізувати готелі через Amadeus</h2>
+    <h2>Sync Hotels via Amadeus API</h2>
     <form id="syncForm">
-        <label for="cityCode">Код міста:</label>
+        <label for="cityCode">City Code:</label>
         <input type="text" id="cityCode" name="cityCode" required>
-        <button type="submit">Синхронізувати</button>
+        <button type="submit">Sync</button>
     </form>
 
-    <h3>Доступні коди міст:</h3>
+    <h3>Available City Codes:</h3>
     <ul>
-        <li>PAR - Париж</li>
-        <li>NYC - Нью-Йорк</li>
-        <li>LON - Лондон</li>
-        <li>BER - Берлін</li>
-        <li>ROM - Рим</li>
-        <li>AMS - Амстердам</li>
-        <li>BCN - Барселона</li>
-        <!-- Можемо потім ще більше додати -->
+        <li>PAR - Paris</li>
+        <li>NYC - New York</li>
+        <li>LON - London</li>
+        <li>BER - Berlin</li>
+        <li>ROM - Rome</li>
+        <li>AMS - Amsterdam</li>
+        <li>BCN - Barcelona</li>
     </ul>
 
     <div id="syncResult"></div>
 </div>
 
 <script>
-    document.getElementById('syncForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // щоб не перезавантажувалась сторінка
 
-        var cityCode = document.getElementById('cityCode').value;
+    const tabs = document.querySelectorAll('.tab-link');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-        fetch('/api/hotels/sync?cityCode=' + encodeURIComponent(cityCode), {
-            method: 'POST'
-        })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('syncResult').innerText = data;
-            })
-            .catch(error => {
-                document.getElementById('syncResult').innerText = 'Помилка: ' + error;
-            });
-    });
-    document.querySelectorAll('.tab-link').forEach(function(tabLink) {
-        tabLink.addEventListener('click', function() {
-            // Відключити всі вкладки
-            document.querySelectorAll('.tab-link').forEach(function(tabLink) {
-                tabLink.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-content').forEach(function(tabContent) {
-                tabContent.style.display = 'none';
-            });
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const targetTab = this.dataset.tab;
+            const currentActive = document.querySelector('.tab-content:not([style*="display: none"])');
 
-            // Активувати поточну вкладку
-            this.classList.add('active');
-            var tabName = this.getAttribute('data-tab');
-            document.getElementById(tabName).style.display = 'block';
+            // Анімація виходу
+            if(currentActive) {
+                currentActive.style.opacity = '0';
+                currentActive.style.transform = 'translateX(30px)';
+            }
+
+            setTimeout(() => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => {
+                    content.style.display = 'none';
+                    content.style.opacity = '0';
+                    content.style.transform = 'translateX(30px)';
+                });
+
+                this.classList.add('active');
+                const targetContent = document.getElementById(targetTab);
+                targetContent.style.display = 'block';
+
+                // Анімація входу
+                setTimeout(() => {
+                    targetContent.style.opacity = '1';
+                    targetContent.style.transform = 'translateX(0)';
+                }, 50);
+            }, 300);
         });
     });
 
+    // Ініціалізація першої вкладки
+    document.querySelector('.tab-link.active').click();
+
+    // Handle user search form
+    document.getElementById('userSearchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = this.querySelector('input[name="email"]').value;
+        fetch(`/admin/searchUser?email=${encodeURIComponent(email)}`)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const usersFragment = doc.getElementById('users').innerHTML;
+                document.getElementById('users').innerHTML = usersFragment;
+            })
+            .catch(error => {
+                console.error('Помилка пошуку:', error);
+                document.querySelector('.user-table tbody').innerHTML =
+                    '<tr><td colspan="3">Помилка завантаження</td></tr>';
+            });
+    });
 </script>
+
 </body>
 </html>

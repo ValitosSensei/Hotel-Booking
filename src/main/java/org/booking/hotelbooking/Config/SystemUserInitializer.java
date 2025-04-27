@@ -34,4 +34,16 @@ public class SystemUserInitializer {
 
         }
     }
+
+    @PostConstruct
+    public void initAdmin() {
+        if(userRepository.findByUsername("system-admin").isEmpty()){
+            User user = new User();
+            user.setUsername("system-admin");
+            user.setEmail("system-admin@gmail.com");
+            user.setPassword("password");
+            user.setRoles(Collections.singleton(Role.ROLE_ADMIN));
+            userRepository.save(user);
+        }
+    }
 }

@@ -1,9 +1,7 @@
 package org.booking.hotelbooking.Controller.WEB;
 
 import org.booking.hotelbooking.DTO.RoomDTO;
-import org.booking.hotelbooking.Entity.Hotel;
-import org.booking.hotelbooking.Entity.RoleRequest;
-import org.booking.hotelbooking.Entity.Room;
+import org.booking.hotelbooking.Entity.*;
 import org.booking.hotelbooking.Repository.RoleRequestRepository;
 import org.booking.hotelbooking.Service.HotelService;
 import org.booking.hotelbooking.Service.RoomService;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -41,9 +40,12 @@ public class AdminController {
         List<Hotel> hotels = hotelService.listHotel();
         List<Room> rooms = roomService.getAllRooms();
         List<RoleRequest> requests = roleRequestRepository.findByIsApprovedFalse();
+
         model.addAttribute("hotels", hotels);
         model.addAttribute("rooms", rooms);
         model.addAttribute("requests", requests);
+        model.addAttribute("searchedUsers", Collections.emptyList());
+
         return "adminPanel";
     }
 
@@ -111,6 +113,30 @@ public class AdminController {
     ){
         userService.approveRequest(id);
         redirectAttributes.addFlashAttribute("successs","Роль мененджера надано");
+        return "redirect:/admin";
+    }
+
+
+    @GetMapping("/searchUser")
+    public String searchUser(@RequestParam String email, Model model) {
+        System.out.println("[DEBUG] Пошук користувача: " + email);
+        try {
+            User user = userService.getUserByEmail(email);
+            System.out.println("[DEBUG] Знайдено: " + user.getEmail() + " | Ролі: " + user.getRoles());
+            model.addAttribute("searchedUsers", Collections.singletonList(user));
+        } catch (RuntimeException e) {
+            System.out.println("[DEBUG] Помилка: " + e.getMessage());
+            model.addAttribute("searchedUsers", Collections.emptyList());
+        }
+        return "adminPanel :: #users";
+    }
+
+    @PostMapping("/grant-admin/{userId}")
+    public String grantAdmin(@PathVariable Long userId, RedirectAttributes redirectAttributes) {
+        User user = userService.getUserById(userId);
+        user.getRoles().add(Role.ROLE_ADMIN);
+        userService.saveUser(user);
+        redirectAttributes.addFlashAttribute("success", "Admin role granted");
         return "redirect:/admin";
     }
 

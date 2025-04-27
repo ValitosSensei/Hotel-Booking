@@ -23,6 +23,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/{hotelId}/reviews").authenticated()
                         .requestMatchers("/bookings/create").authenticated() // Дозвіл для бронювань
+                        .requestMatchers("/admin/searchUser").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form

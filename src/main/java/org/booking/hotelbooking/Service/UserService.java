@@ -85,7 +85,17 @@ public class UserService {
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Користувача не знайдено"));
     }
 
+
+    public void grantAdminRole(Long userId) {
+        User user = getUserById(userId);
+        user.getRoles().add(Role.ROLE_ADMIN);
+        userRepository.save(user);
+    }
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
 }
