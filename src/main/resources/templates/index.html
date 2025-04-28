@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Hotel Booking</title>
-    <link rel="stylesheet" href="/index.css"> <!-- Підключення стилів -->
+    <link rel="stylesheet" href="/index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script>
         function toggleFilter() {
@@ -10,120 +10,75 @@
             const ratingFields = document.querySelectorAll(".rating-filter input, .rating-filter select");
             const ratingFilterDiv = document.querySelector(".rating-filter");
 
-            // Якщо вибрано "Усі міста", вимикаємо фільтрацію та скидаємо значення
             if (citySelect.value === "") {
-                ratingFields.forEach(field => field.disabled = true); // Деактивуємо фільтри
-                // Скидаємо значення фільтру за рейтингом
+                ratingFields.forEach(field => field.disabled = true);
                 document.querySelector("input[name='minRating']").value = "";
                 document.querySelector("input[name='maxRating']").value = "";
-                document.querySelector("select[name='sortOrder']").value = "desc"; // Встановлюємо сортування за замовчуванням
-                ratingFilterDiv.style.display = "none"; // Приховуємо фільтри
+                document.querySelector("select[name='sortOrder']").value = "desc";
+                ratingFilterDiv.style.display = "none";
             } else {
-                ratingFields.forEach(field => field.disabled = false); // Активуємо фільтри
-                ratingFilterDiv.style.display = "block"; // Показуємо фільтри
+                ratingFields.forEach(field => field.disabled = false);
+                ratingFilterDiv.style.display = "flex";
             }
         }
-        function toggleMenu() {
-            const nav = document.querySelector('nav ul');
-            nav.classList.toggle('active');
 
-            // Закривати меню при кліку поза ним
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('nav') && !e.target.closest('.menu-toggle')) {
-                    nav.classList.remove('active');
-                }
-            });
-        }
-
-        // Викликаємо функцію при завантаженні сторінки та при зміні міста
         window.onload = toggleFilter;
     </script>
 </head>
 <body>
-
 <div class="container">
     <header>
-        <h1>Welcome to the Hotel Booking System</h1>
-        <button class="menu-toggle" onclick="toggleMenu()">
-            <i class="fas fa-bars"></i>
-        </button>
-        <nav>
-            <ul>
-                <li><a href="/register"><i class="fas fa-user-plus"></i>Реєстрація</a></li>
-                <li><a href="/login"><i class="fas fa-sign-in-alt"></i>Вхід</a></li>
-                <li><a href="/profile"><i class="fas fa-user-circle"></i>Профіль</a></li>
-                <li><a href="/create"><i class="fas fa-plus-circle"></i>Створити</a></li>
-                <li><a href="/admin"><i class="fas fa-lock"></i>Адмінка</a></li>
-            </ul>
-        </nav>
+        <h1>Hotel Booking System</h1>
     </header>
 
     <main>
         <form method="get" th:action="@{/}">
-            <div class="filter">
-                <label>City:</label>
-                <select name="city" th:onchange="this.form.submit(); toggleFilter();">
-                    <option value="">All Cities</option>
-                    <option th:each="city : ${cities}" th:value="${city}" th:text="${city}" th:selected="${selectedCity == city}"></option>
-                </select>
-            </div>
-
-            <!-- Форма для фільтрації за рейтингом, доступна тільки якщо вибрано місто -->
-            <div class="rating-filter" style="display: none;">
-                <label>Sort by Rating:</label>
-                <select name="sortOrder" onchange="this.form.submit()">
-                    <option value="desc" th:selected="${sortOrder == 'desc'}">Highest to Lowest</option>
-                    <option value="asc" th:selected="${sortOrder == 'asc'}">Lowest to Highest</option>
-                </select>
-
-                <div>
-                    <label>Minimum Rating:</label>
-                    <input type="number" step="0.1" name="minRating" th:value="${minRating}" placeholder="Enter minimum rating" />
+            <div class="filters-container">
+                <div class="filter-group">
+                    <select name="city" th:onchange="this.form.submit(); toggleFilter();">
+                        <option value="">All Cities</option>
+                        <option th:each="city : ${cities}" th:value="${city}" th:text="${city}" th:selected="${selectedCity == city}"></option>
+                    </select>
                 </div>
-                <div>
-                    <label>Maximum Rating:</label>
-                    <input type="number" step="0.1" name="maxRating" th:value="${maxRating}" placeholder="Enter maximum rating" />
-                </div>
-            </div>
 
-            <div class="filter-button-container">
-                <button type="submit">🔍 Застосувати фільтри</button>
+                <div class="rating-filter">
+                    <div class="filter-item">
+                        <select name="sortOrder" onchange="this.form.submit()">
+                            <option value="desc" th:selected="${sortOrder == 'desc'}">Rating: High to Low</option>
+                            <option value="asc" th:selected="${sortOrder == 'asc'}">Rating: Low to High</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <input type="number" step="0.1" name="minRating" th:value="${minRating}" placeholder="Min rating" />
+                    </div>
+                    <div class="filter-item">
+                        <input type="number" step="0.1" name="maxRating" th:value="${maxRating}" placeholder="Max rating" />
+                    </div>
+                </div>
+                <button type="submit" class="filter-btn">Apply Filters</button>
             </div>
         </form>
 
-        <section>
-            <h2>List of Hotels</h2>
-            <div class="hotels-list">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Hotel Name</th>
-                        <th>Address</th>
-                        <th>City</th>
-                        <th>Country</th>
-                        <th>Contact Info</th>
-                        <th>Rooms</th>
-                        <th>Rating</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="hotel : ${hotels}">
-                        <td th:text="${hotel.name}"></td>
-                        <td th:text="${hotel.address}"></td>
-                        <td th:text="${hotel.city}"></td>
-                        <td th:text="${hotel.country}"></td>
-                        <td th:text="${hotel.contactInfo}"></td>
-                        <td>
-                                    <span th:with="rating=${hotel.averageRating}">
-                                        <span th:each="i : ${#numbers.sequence(1, 5)}"
-                                              th:classappend="${i <= rating} ? 'fa fa-star checked' : 'fa fa-star'"></span>
-                                        <span th:text="'(' + ${#numbers.formatDecimal(rating, 1, 1)} + ')'"></span>
-                                    </span>
-                        </td>
-                        <td><a th:href="@{/{hotelId}/rooms(hotelId=${hotel.id})}">View Rooms</a></td>
-                    </tr>
-                    </tbody>
-                </table>
+        <section class="hotels-section">
+            <div class="hotels-grid">
+                <div class="hotel-card" th:each="hotel : ${hotels}">
+                    <div class="card-header">
+                        <h3 th:text="${hotel.name}"></h3>
+                        <div class="rating">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}"
+                                  th:classappend="${i <= hotel.averageRating} ? 'fas fa-star checked' : 'fas fa-star'"></span>
+                            <span class="rating-value" th:text="${#numbers.formatDecimal(hotel.averageRating, 1, 1)}"></span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p><i class="fas fa-map-marker-alt"></i> <span th:text="${hotel.address}"></span></p>
+                        <p><i class="fas fa-city"></i> <span th:text="${hotel.city}"></span>, <span th:text="${hotel.country}"></span></p>
+                        <p><i class="fas fa-phone"></i> <span th:text="${hotel.contactInfo}"></span></p>
+                    </div>
+                    <a th:href="@{/{hotelId}/rooms(hotelId=${hotel.id})}" class="rooms-btn">
+                        View Rooms <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
         </section>
     </main>
@@ -132,5 +87,16 @@
         <p>&copy; 2025 Hotel Booking System</p>
     </footer>
 </div>
+
+<!-- Sidebar Navigation -->
+<aside class="sidebar">
+    <ul>
+        <li><a href="/register"><i class="fas fa-user-plus"></i><span>Реєстрація</span></a></li>
+        <li><a href="/login"><i class="fas fa-sign-in-alt"></i><span>Вхід</span></a></li>
+        <li><a href="/profile"><i class="fas fa-user-circle"></i><span>Профіль</span></a></li>
+        <li><a href="/create"><i class="fas fa-plus-circle"></i><span>Створити</span></a></li>
+        <li><a href="/admin"><i class="fas fa-lock"></i><span>Адмінка</span></a></li>
+    </ul>
+</aside>
 </body>
 </html>
