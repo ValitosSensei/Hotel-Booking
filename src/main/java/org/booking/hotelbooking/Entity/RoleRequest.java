@@ -22,14 +22,35 @@ public class RoleRequest {
     private boolean isApproved = false;
 
 
-    public RoleRequest() {}
+    private String hotelName;
+    private String hotelAddress;
 
-    public RoleRequest(Long id, User user, Role requestRole, LocalDateTime requestDate, boolean isApproved) {
+    public RoleRequest(Long id, User user, Role requestRole, LocalDateTime requestDate, boolean isApproved, String hotelName, String hotelAddress) {
         this.id = id;
         this.user = user;
         this.requestRole = requestRole;
         this.requestDate = requestDate;
         this.isApproved = isApproved;
+        this.hotelName = hotelName;
+        this.hotelAddress = hotelAddress;
+    }
+
+    public RoleRequest() {}
+
+    public String getHotelName() {
+        return hotelName;
+    }
+
+    public void setHotelName(String hotelName) {
+        this.hotelName = hotelName;
+    }
+
+    public String getHotelAddress() {
+        return hotelAddress;
+    }
+
+    public void setHotelAddress(String hotelAddress) {
+        this.hotelAddress = hotelAddress;
     }
 
     public Long getId() {

@@ -10,6 +10,7 @@ import org.booking.hotelbooking.Service.HotelService;
 import org.booking.hotelbooking.Service.RoomService;
 import org.booking.hotelbooking.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -89,26 +90,38 @@ public class ManagerController {
         redirectAttributes.addAttribute("userId", userId);
         return "redirect:/profile";
     }
+//
+//    @GetMapping("/editRoom/{roomId}")
+//    public String showEditRoomForm(
+//            @PathVariable Long roomId,
+//            @RequestParam("userId") Long userId,
+//            Model model
+//    ) {
+//        Room room = roomService.getRoomById(roomId);
+//        model.addAttribute("room", room);
+//        model.addAttribute("userId", userId);
+//        return "manager-edit-room";
+//    }
 
+    // Додати метод для AJAX-запиту
     @GetMapping("/editRoom/{roomId}")
-    public String showEditRoomForm(
-            @PathVariable Long roomId,
-            @RequestParam("userId") Long userId,
-            Model model
-    ) {
+    @ResponseBody
+    @CrossOrigin(origins = "http://localhost:8080") // Вкажіть порт вашого фронтенду
+    public ResponseEntity<Room> getRoomForEdit(@PathVariable Long roomId) {
         Room room = roomService.getRoomById(roomId);
-        model.addAttribute("room", room);
-        model.addAttribute("userId", userId);
-        return "manager-edit-room";
+        room.setHotel(null); // Вимикаємо циклічні посилання
+        return ResponseEntity.ok(room);
     }
 
     @PostMapping("/editRoom/{roomId}")
     public String editRoom(
             @PathVariable Long roomId,
+            @ModelAttribute Room roomData,
             @RequestParam("userId") Long userId,
-            @ModelAttribute("room") Room roomData,
             RedirectAttributes redirectAttributes
     ) {
+        System.out.println("Отримано запит на оновлення кімнати ID: " + roomId);
+        System.out.println("Новий номер: " + roomData.getRoomNumber());
         Room room = roomService.getRoomById(roomId);
         room.setRoomNumber(roomData.getRoomNumber());
         room.setType(roomData.getType());
@@ -116,8 +129,9 @@ public class ManagerController {
         room.setAvailableForDates(roomData.isAvailableForDates());
         roomService.saveRoom(room);
 
+        redirectAttributes.addAttribute("hotelId", room.getHotel().getId());
         redirectAttributes.addAttribute("userId", userId);
-        return "redirect:/manager/hotels/" + room.getHotel().getId();
+        return "redirect:/manager/hotels/{hotelId}";
     }
 
     @GetMapping("/hotels/{hotelId}/rooms/create")

@@ -4,76 +4,63 @@
     <meta charset="UTF-8">
     <title>Керування готелем</title>
     <style>
-        .tab {
+        /* Стилі для модальних вікон */
+        .modal {
             display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            width: 400px;
         }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        /* Стилі для таблиці кімнат */
+        .rooms-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .rooms-table th, .rooms-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        button { cursor: pointer; padding: 8px 12px; }
     </style>
 </head>
 <body>
 <h1 th:text="${hotel.name}">Назва готелю</h1>
 <a th:href="@{/profile(userId=${userId})}">← Назад до профілю</a>
 
-<!-- Просто вивід даних -->
-<div id="hotelInfo">
+<!-- Інформація про готель -->
+<div class="hotel-info">
     <h2>Інформація про готель</h2>
-    <p><strong>Назва:</strong> <span th:text="${hotel.name}">Готель</span></p>
-    <p><strong>Адреса:</strong> <span th:text="${hotel.address}">Адреса</span></p>
-    <p><strong>Місто:</strong> <span th:text="${hotel.city}">Місто</span></p>
-    <p><strong>Країна:</strong> <span th:text="${hotel.country}">Країна</span></p>
-    <p><strong>Контактна інформація:</strong> <span th:text="${hotel.contactInfo}">Контакти</span></p>
+    <p><strong>Адреса:</strong> <span th:text="${hotel.address}"></span></p>
+    <p><strong>Місто:</strong> <span th:text="${hotel.city}"></span></p>
+    <p><strong>Країна:</strong> <span th:text="${hotel.country}"></span></p>
 </div>
 
-<div id="roomsInfo">
-    <h2>Список кімнат</h2>
-    <table>
+<!-- Список кімнат -->
+<div class="rooms-section">
+    <h2>Кімнати готелю</h2>
+    <table class="rooms-table">
         <thead>
         <tr>
-            <th>Номер кімнати</th>
-            <th>Тип</th>
-            <th>Ціна</th>
-            <th>Доступність</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="room : ${hotel.rooms}">
-            <td th:text="${room.roomNumber}">101</td>
-            <td th:text="${room.type}">Стандарт</td>
-            <td th:text="${room.price}">1000</td>
-            <td th:text="${room.isAvailableForDates() ? 'Так' : 'Ні'}">Так</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-<!-- Кнопки для відкриття вкладок редагування -->
-<div class="tab-buttons">
-    <button onclick="showTab('hotelTab')">Редагувати готель</button>
-    <button onclick="showTab('roomsTab')">Редагувати кімнати</button>
-</div>
-
-<!-- Вкладка редагування готелю -->
-<div id="hotelTab" class="tab">
-    <h2>Редагування готелю</h2>
-    <form th:action="@{/manager/editHotel/{hotelId}(hotelId=${hotel.id}, userId=${userId})}"
-          th:object="${hotel}"
-          method="post">
-        <p>Назва: <input type="text" th:field="*{name}" placeholder="Назва готелю" required></p>
-        <p>Адреса: <input type="text" th:field="*{address}" placeholder="Адреса" required></p>
-        <p>Місто: <input type="text" th:field="*{city}" placeholder="Місто" required></p>
-        <p>Країна: <input type="text" th:field="*{country}" placeholder="Країна" required></p>
-        <p>Контактна інформація: <input type="text" th:field="*{contactInfo}" placeholder="Контактна інформація"></p>
-        <button type="submit">Зберегти зміни</button>
-    </form>
-</div>
-
-
-<!-- Вкладка редагування кімнат -->
-<div id="roomsTab" class="tab">
-    <h2>Редагування кімнат</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>Номер кімнати</th>
+            <th>Номер</th>
             <th>Тип</th>
             <th>Ціна</th>
             <th>Доступність</th>
@@ -82,43 +69,122 @@
         </thead>
         <tbody>
         <tr th:each="room : ${hotel.rooms}">
-            <td th:text="${room.roomNumber}">101</td>
-            <td th:text="${room.type}">Стандарт</td>
-            <td th:text="${room.price}">1000</td>
-            <td th:text="${room.isAvailableForDates() ? 'Так' : 'Ні'}">Так</td>
+            <td th:text="${room.roomNumber}"></td>
+            <td th:text="${room.type}"></td>
+            <td th:text="${room.price}"></td>
+            <td th:text="${room.availableForDates ? 'Так' : 'Ні'}"></td>
             <td>
-                <a th:href="@{/manager/editRoom/{roomId}(roomId=${room.id}, userId=${userId})}">
-                    Редагувати
-                </a>
+                <button th:onclick="'openEditRoomModal(' + ${room.id} + ', ' + ${userId} + ')'">Редагувати</button>
             </td>
         </tr>
         </tbody>
     </table>
-    <a th:href="@{/manager/hotels/{hotelId}/rooms/create(hotelId=${hotel.id}, userId=${userId})}">
-        <button>Додати кімнату</button>
-    </a>
 </div>
 
+<!-- Кнопки управління -->
+<div class="controls">
+    <button onclick="openModal('editHotelModal')">Редагувати готель</button>
+    <button onclick="openModal('addRoomModal')">Додати кімнату</button>
+</div>
+
+<!-- Модальне вікно редагування готелю -->
+<div id="editHotelModal" class="modal">
+    <h2>Редагування готелю</h2>
+    <form th:action="@{/manager/editHotel/{hotelId}(hotelId=${hotel.id}, userId=${userId})}" method="post">
+        <label>Назва: <input type="text" th:value="${hotel.name}" name="name" required></label>
+        <label>Адреса: <input type="text" th:value="${hotel.address}" name="address" required></label>
+        <label>Місто: <input type="text" th:value="${hotel.city}" name="city" required></label>
+        <label>Країна: <input type="text" th:value="${hotel.country}" name="country" required></label>
+        <button type="submit">Зберегти</button>
+        <button type="button" onclick="closeModal()">Скасувати</button>
+    </form>
+</div>
+
+<!-- Модальне вікно додавання кімнати -->
+<div id="addRoomModal" class="modal">
+    <h2>Додати кімнату</h2>
+    <form th:action="@{/manager/hotels/{hotelId}/rooms/create(hotelId=${hotel.id}, userId=${userId})}" method="post">
+        <label>Номер: <input type="text" name="roomNumber" required></label>
+        <label>Тип: <input type="text" name="type" required></label>
+        <label>Ціна: <input type="number" name="price" step="0.01" required></label>
+        <label>Доступність:
+            <select name="availableForDates">
+                <option value="true">Так</option>
+                <option value="false">Ні</option>
+            </select>
+        </label>
+        <button type="submit">Додати</button>
+        <button type="button" onclick="closeModal()">Скасувати</button>
+    </form>
+</div>
+
+<!-- Модальне вікно редагування кімнати -->
+<div id="editRoomModal" class="modal">
+    <h2>Редагування кімнати</h2>
+    <form id="editRoomForm" method="post">
+        <input type="hidden" name="roomId" id="editRoomId">
+        <input type="hidden" name="userId" th:value="${userId}">
+        <label>Номер: <input type="text" id="editRoomNumber" name="roomNumber" required></label>
+        <label>Тип: <input type="text" id="editRoomType" name="type" required></label>
+        <label>Ціна: <input type="number" id="editRoomPrice" name="price" step="0.01" required></label>
+        <label>Доступність: <input type="checkbox" id="editRoomAvailable" name="availableForDates"></label>
+        <button type="submit">Зберегти</button>
+        <button type="button" onclick="closeModal()">Скасувати</button>
+    </form>
+</div>
+
+<!-- Overlay для модальних вікон -->
+<div class="modal-overlay" onclick="closeModal()"></div>
+
 <script>
-    function showTab(tabId) {
-        document.getElementById('hotelInfo').style.display = 'none';
-        document.getElementById('roomsInfo').style.display = 'none';
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.style.display = 'none';
-        });
-        const selectedTab = document.getElementById(tabId);
-        if (selectedTab) {
-            selectedTab.style.display = 'block';
+    // Функції для модальних вікон
+    function openModal(modalId) {
+        document.querySelector('.modal-overlay').style.display = 'block';
+        document.getElementById(modalId).style.display = 'block';
+    }
+
+    function closeModal() {
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        document.querySelector('.modal-overlay').style.display = 'none';
+    }
+
+    // Завантаження даних кімнати для редагування
+    async function openEditRoomModal(roomId, userId) {
+        try {
+            const response = await fetch(`/manager/editRoom/${roomId}?userId=${userId}`);
+            if (!response.ok) throw new Error("Помилка сервера: " + response.status);
+            const room = await response.json();
+
+            document.getElementById('editRoomId').value = room.id;
+            document.getElementById('editRoomNumber').value = room.roomNumber;
+            document.getElementById('editRoomType').value = room.type;
+            document.getElementById('editRoomPrice').value = room.price;
+            document.getElementById('editRoomAvailable').checked = room.availableForDates;
+
+            openModal('editRoomModal');
+        } catch (error) {
+            console.error('Помилка:', error);
+            alert('Не вдалося завантажити дані кімнати: ' + error.message);
         }
     }
 
-    // По замовчуванню: вкладки редагування приховані
-    window.onload = function () {
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.style.display = 'none';
-        });
-    };
-</script>
+    // Відправка форми редагування кімнати
+    document.getElementById('editRoomForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const roomId = formData.get('roomId');
 
+        try {
+            await fetch(`/manager/editRoom/${roomId}`, {
+                method: 'POST',
+                body: formData
+            });
+            location.reload(); // Оновлення сторінки після збереження
+        } catch (error) {
+            console.error('Помилка:', error);
+            alert('Не вдалося зберегти зміни');
+        }
+    });
+</script>
 </body>
 </html>

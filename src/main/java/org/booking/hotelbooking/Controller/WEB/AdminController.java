@@ -39,11 +39,11 @@ public class AdminController {
     public String adminPanel(Model model) {
         List<Hotel> hotels = hotelService.listHotel();
         List<Room> rooms = roomService.getAllRooms();
-        List<RoleRequest> requests = roleRequestRepository.findByIsApprovedFalse();
+        List<RoleRequest> requests = roleRequestRepository.findByIsApprovedFalse(); // Переконайтеся, що запити дійсно є в базі
 
         model.addAttribute("hotels", hotels);
         model.addAttribute("rooms", rooms);
-        model.addAttribute("requests", requests);
+        model.addAttribute("requests", requests); // Додано
         model.addAttribute("searchedUsers", Collections.emptyList());
 
         return "adminPanel";
@@ -119,16 +119,13 @@ public class AdminController {
 
     @GetMapping("/searchUser")
     public String searchUser(@RequestParam String email, Model model) {
-        System.out.println("[DEBUG] Пошук користувача: " + email);
         try {
             User user = userService.getUserByEmail(email);
-            System.out.println("[DEBUG] Знайдено: " + user.getEmail() + " | Ролі: " + user.getRoles());
             model.addAttribute("searchedUsers", Collections.singletonList(user));
         } catch (RuntimeException e) {
-            System.out.println("[DEBUG] Помилка: " + e.getMessage());
             model.addAttribute("searchedUsers", Collections.emptyList());
         }
-        return "adminPanel :: #users";
+        return "adminPanel :: #userResults"; // Повертаємо лише таблицю
     }
 
     @PostMapping("/grant-admin/{userId}")

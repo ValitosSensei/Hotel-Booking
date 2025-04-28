@@ -87,36 +87,47 @@
     </table>
 </div>
 
-<!-- Users tab -->
+<!-- Users tab (видалити дубльований блок) -->
 <div id="users" class="tab-content" style="display: none;">
-    <div th:fragment="users"> <!-- Додано th:fragment -->
+    <div th:fragment="users">
         <h2>Manage Users</h2>
-        <form id="userSearchForm" class="user-search-form" th:action="@{/admin/searchUser}" method="get">
-            <input type="email" name="email" placeholder="Search by email..." required>
+
+        <!-- Пошукова форма -->
+        <form id="userSearchForm" class="user-search-form">
+            <input type="email" id="searchEmail" name="email" placeholder="Search by email..." required>
             <button type="submit">Search</button>
         </form>
-        <table class="user-table">
-            <thead>
-            <tr>
-                <th>Email</th>
-                <th>Roles</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="user : ${searchedUsers}">
-                <td th:text="${user.email}"></td>
-                <td>
-                    <span th:each="role : ${user.roles}" th:text="${role} + ' '"></span>
-                </td>
-                <td>
-                    <form th:action="@{/admin/grant-admin/{userId}(userId=${user.id})}" method="post">
-                        <button type="submit">Grant Admin</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+
+        <!-- Контейнер для результатів -->
+        <div id="userResults">
+            <table class="user-table">
+                <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Roles</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${searchedUsers}">
+                    <td th:text="${user.email}"></td>
+                    <td>
+                            <span th:each="role : ${user.roles}"
+                                  th:text="${role} + ' '"></span>
+                    </td>
+                    <td>
+                        <form th:action="@{/admin/grant-admin/{userId}(userId=${user.id})}"
+                              method="post">
+                            <button type="submit">Grant Admin</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${searchedUsers.isEmpty()}">
+                    <td colspan="3">No users found</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -132,6 +143,10 @@
         </tr>
         </thead>
         <tbody>
+        <!-- Додано перевірку на пустий список -->
+        <tr th:if="${requests.isEmpty()}">
+            <td colspan="3">No pending requests</td>
+        </tr>
         <tr th:each="request : ${requests}">
             <td th:text="${request.user.email}"></td>
             <td th:text="${#temporals.format(request.requestDate, 'dd-MM-yyyy HH:mm')}"></td>
@@ -144,7 +159,6 @@
         </tbody>
     </table>
 </div>
-
 <!-- Synchronization tab -->
 <div id="sync" class="tab-content" style="display: none;">
     <h2>Sync Hotels via Amadeus API</h2>
@@ -209,21 +223,23 @@
     document.querySelector('.tab-link.active').click();
 
     // Handle user search form
+    // Обробник форми пошуку
     document.getElementById('userSearchForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        const email = this.querySelector('input[name="email"]').value;
+        const email = document.getElementById('searchEmail').value;
+
         fetch(`/admin/searchUser?email=${encodeURIComponent(email)}`)
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) throw new Error('Помилка мережі');
+                return response.text();
+            })
             .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const usersFragment = doc.getElementById('users').innerHTML;
-                document.getElementById('users').innerHTML = usersFragment;
+                document.getElementById('userResults').innerHTML = html;
             })
             .catch(error => {
-                console.error('Помилка пошуку:', error);
-                document.querySelector('.user-table tbody').innerHTML =
-                    '<tr><td colspan="3">Помилка завантаження</td></tr>';
+                console.error('Помилка:', error);
+                document.getElementById('userResults').innerHTML = `
+                <tr><td colspan="3">Помилка завантаження</td></tr>`;
             });
     });
 </script>
