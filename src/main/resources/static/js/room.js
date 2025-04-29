@@ -3,24 +3,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const bookingForm = document.getElementById('booking-form');
 
     // Анімація для інпутів
-    document.querySelectorAll('#booking-form input').forEach(input => {
-        input.addEventListener("focus", () => {
-            input.style.borderColor = "#007bff";
-        });
-        input.addEventListener("blur", () => {
-            input.style.borderColor = "#ccc";
-        });
-    });
 
-    // Відкриття/закриття модального вікна
     document.querySelectorAll('.book-button').forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
-            const roomId = parseInt(button.getAttribute('data-room-id'), 10); // Перетворення в число
+            const roomId = button.getAttribute('data-room-id');
             document.getElementById('room-id').value = roomId;
             modal.style.display = "flex";
         });
     });
+
 
     document.querySelector('.close-modal').addEventListener('click', () => {
         modal.style.display = "none";

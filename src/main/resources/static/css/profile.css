@@ -1,29 +1,30 @@
-/* Основні стилі для сторінки */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
-}
-
-h1, h2 {
+    background: linear-gradient(120deg, #f9f9f9, #e0f7fa);
     color: #333;
 }
 
-/* Стиль для header */
+/* Заголовки */
+h1, h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+/* HEADER */
 .header {
-    background-color: #333;
+    background-color: #1a2a36;
+    position: relative;
+    padding: 15px 30px;
     color: white;
-    padding: 20px;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: relative;
-}
-
-.site-name {
-    font-size: 2rem;
-    color: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 .logo-link {
@@ -35,164 +36,138 @@ h1, h2 {
 
 .logo {
     width: 50px;
-    height: auto;
-    margin-right: 10px;
+    margin-right: 15px;
+}
+
+.site-name {
+    font-size: 2rem;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Додано тінь */
+    margin-left: 20px;
+    z-index: 1; /* Забезпечує перекриття */
+    position: relative;
 }
 
 .logout-form {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .logout-btn {
-    background-color: #4CAF50;
-    color: white;
+    background: #e74c3c;
     border: none;
     padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 5px;
+    color: white;
+    border-radius: 30px;
+    font-weight: bold;
+    transition: background 0.3s ease;
 }
 
 .logout-btn:hover {
-    background-color: #45a049;
+    background: #c0392b;
 }
 
-/* Контейнер для сторінки */
+/* Layout */
 .container {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
+    margin: 30px;
 }
 
-/* Sidebar для вкладок */
+/* Sidebar */
 .sidebar {
     width: 250px;
-    background-color: #f1f1f1;
-    padding: 20px;
-    border-radius: 5px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 20px;
+    height: fit-content;
 }
 
 .tab-link {
     width: 100%;
-    padding: 10px;
-    margin: 5px 0;
-    text-align: left;
-    background-color: #ddd;
-    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background-color: #ecf0f1;
+    border: none;
+    border-radius: 10px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    border-radius: 5px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
 }
 
-.tab-link.active {
-    background-color: #4CAF50;
-    color: white;
+.tab-link i {
+    font-size: 1.2rem;
 }
 
 .tab-link:hover {
-    background-color: #ddd;
+    background-color: #d0ece7;
+    transform: scale(1.02);
 }
 
-/* Таблиця */
+.tab-link.active {
+    background-color: #16a085;
+    color: white;
+}
+
+/* Вміст вкладки */
+.tab-content-wrapper {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.tab-content-wrapper .tab-content:first-child {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+/* Таблиці */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
 }
 
-table, th, td {
-    border: 1px solid #ddd;
-}
-
 th, td {
-    padding: 10px;
+    padding: 12px;
     text-align: left;
+    border-bottom: 1px solid #ddd;
 }
 
 th {
-    background-color: #f4f4f4;
+    background-color: #e8f8fa;
+    font-weight: 600;
 }
 
-tr:nth-child(even) {
-    background-color: #f9f9f9;
+tr:hover {
+    background-color: #f1f1f1;
 }
 
-/* Вміст вкладок */
-.tab-content-wrapper {
-    width: 70%;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Вміст вкладок */
-.tab-content {
-    display: none;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-/* Стиль для вкладок */
-.tab-content-wrapper .tab-content:first-child {
-    display: block;
-}
-
-
-/* Модальне вікно */
-
-
-/* Контент модального вікна */
-.modal-content {
-    background-color: #fff;
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 10px;
-    width: 40%;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    animation: slideUp 0.4s ease;
-}
-
-/* Кнопка закриття */
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+/* Кнопки */
+button {
+    font-family: inherit;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
     cursor: pointer;
+    transition: all 0.2s ease-in-out;
 }
 
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-}
-
-/* Анімація для фону */
-@keyframes fadeInBackground {
-    from {background-color: rgba(0,0,0,0);}
-    to {background-color: rgba(0,0,0,0.5);}
-}
-
-/* Анімація для вмісту (випливаюче знизу) */
-@keyframes slideUp {
-    from {
-        transform: translateY(100px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+button:hover {
+    opacity: 0.9;
 }
 
 /* Модальні вікна */
@@ -201,15 +176,31 @@ tr:nth-child(even) {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
+    transform: translate(-50%, -50%) scale(0.95);
     background: white;
     padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    z-index: 1001;
-    animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    z-index: 10000;
+    animation: modalFadeIn 0.3s ease forwards;
     width: 450px;
-    max-width: 90%;
+    max-width: 95%;
+}
+.modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.modal label {
+    display: block;
+    margin-bottom: 10px;
+}
+.modal input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-top: 5px;
 }
 
 .modal-overlay {
@@ -217,58 +208,89 @@ tr:nth-child(even) {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(5px);
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(3px);
     z-index: 1000;
 }
 
 @keyframes modalFadeIn {
-    from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    from {opacity: 0; transform: translate(-50%, -50%) scale(0.9);}
+    to {opacity: 1; transform: translate(-50%, -50%) scale(1);}
 }
 
-.modal form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+.modal .close {
+    float: right;
+    font-size: 1.5rem;
+    color: #aaa;
+    cursor: pointer;
 }
 
-.modal label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 8px;
-    font-weight: 500;
+.modal .close:hover {
+    color: #333;
 }
 
-.modal input, .modal select {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1em;
+.modal h2 {
+    margin-top: 0;
 }
-
 
 .modal-btn {
+    background: #3498db;
+    color: white;
+    font-weight: bold;
+}
+
+.modal-btn.cancel-btn {
+    background: #e74c3c;
+}
+.main-container {
+    display: flex;
+    margin: 20px;
+    gap: 30px;
+}
+
+.site-name.blink {
+    animation: shimmer 2s infinite;
+    background: linear-gradient(90deg, #fff, #16a085, #fff);
+    background-size: 200% auto;
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    font-weight: bold;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -100% center;
+    }
+    50% {
+        background-position: 100% center;
+    }
+    100% {
+        background-position: -100% center;
+    }
+}
+.no-underline {
+    text-decoration: none;
+}
+
+.button-link {
+    display: inline-block;
+    padding: 10px 16px;
     background-color: #16a085;
     color: white;
-    padding: 10px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
 }
-
-.modal-btn:hover {
-    background-color: #1abc9c;
+.button-link:hover {
+    background-color: rgba(22, 160, 133, 0.63);
 }
-
-.cancel-btn {
-    background-color: #e74c3c;
-}
-
-.cancel-btn:hover {
-    background-color: #c0392b;
+element.style {
+    color: green;
+    align-content: center;
+    text-align: center;
 }

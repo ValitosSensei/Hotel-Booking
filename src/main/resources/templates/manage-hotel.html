@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="/css/manager-panel.css">
 </head>
 <body>
+<div th:if="${param.accessDenied}">Доступ заборонено!</div>
+<div th:if="${param.error}">Помилка: [[${param.error}]]</div>
 <!-- Бокова панель -->
 <div class="sidebar">
     <div class="nav-tabs">
@@ -58,7 +60,13 @@
                         <td th:text="${room.price}"></td>
                         <td th:text="${room.availableForDates ? 'Так' : 'Ні'}"></td>
                         <td>
-                            <button th:onclick="'openEditRoomModal(' + ${room.id} + ', ' + ${userId} + ')'">Редагувати</button>
+                            <div class="action-buttons">
+                                <button class="edit-btn" th:onclick="'openEditRoomModal(' + ${room.id} + ')'">Редагувати</button>
+                                <button class="delete-btn"
+                                        th:onclick="'confirmDeleteRoom(' + ${room.id} + ',' + ${hotel.id} + ',' + ${userId} + ')'">
+                                    Видалити
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     </tbody>
@@ -109,7 +117,10 @@
         <label>Номер: <input type="text" id="editRoomNumber" name="roomNumber" required></label>
         <label>Тип: <input type="text" id="editRoomType" name="type" required></label>
         <label>Ціна: <input type="number" id="editRoomPrice" name="price" step="0.01" required></label>
-        <label>Доступність: <input type="checkbox" id="editRoomAvailable" name="availableForDates"></label>
+        <div class="form-row">
+            <label for="editRoomAvailable">Доступна для бронювання</label>
+            <input type="checkbox" id="editRoomAvailable" name="availableForDates">
+        </div>
         <button type="submit">Зберегти</button>
         <button type="button" onclick="closeModal()">Скасувати</button>
     </form>

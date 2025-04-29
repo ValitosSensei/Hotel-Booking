@@ -7,6 +7,9 @@ import org.booking.hotelbooking.Service.HotelService;
 import org.booking.hotelbooking.Service.RoomService;
 import org.booking.hotelbooking.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +39,9 @@ public class AdminController {
     }
 
     @GetMapping
-    public String adminPanel(Model model) {
+    public String adminPanel(Model model,
+     @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser) {
+
         List<Hotel> hotels = hotelService.listHotel();
         List<Room> rooms = roomService.getAllRooms();
         List<RoleRequest> requests = roleRequestRepository.findByIsApprovedFalse(); // Переконайтеся, що запити дійсно є в базі

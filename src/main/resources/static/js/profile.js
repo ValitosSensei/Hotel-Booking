@@ -16,7 +16,10 @@ function openTab(evt, tabName) {
 }
 
 function openManagerRequestModal() {
-    document.getElementById('managerRequestModal').style.display = 'block';
+    const modal = document.getElementById('managerRequestModal');
+    const overlay = document.querySelector('.modal-overlay');
+    overlay.style.display = 'block';
+    modal.style.display = 'block';
 }
 
 document.addEventListener('DOMContentLoaded', function() {

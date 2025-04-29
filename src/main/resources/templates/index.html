@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Hotel Booking</title>
     <link rel="stylesheet" href="/css/index.css">
@@ -8,7 +8,7 @@
 <body>
 <div class="container">
     <header>
-        <h1>Hotel Booking System</h1>
+        <h1>Hotel Booking</h1>
     </header>
 
     <main>
@@ -65,17 +65,29 @@
 
     <footer>
         <p>&copy; 2025 Hotel Booking System</p>
+        <div th:if="${error}" class="alert alert-danger">
+            [[${error}]]
+        </div>
     </footer>
 </div>
 
 <!-- Sidebar Navigation -->
 <aside class="sidebar">
     <ul>
-        <li><a href="/register"><i class="fas fa-user-plus"></i><span>Реєстрація</span></a></li>
-        <li><a href="/login"><i class="fas fa-sign-in-alt"></i><span>Вхід</span></a></li>
-        <li><a href="/profile"><i class="fas fa-user-circle"></i><span>Профіль</span></a></li>
-        <li><a href="/create"><i class="fas fa-plus-circle"></i><span>Створити</span></a></li>
-        <li><a href="/admin"><i class="fas fa-lock"></i><span>Адмінка</span></a></li>
+        <li sec:authorize="!isAuthenticated()">
+            <a href="/register"><i class="fas fa-user-plus"></i><span>Реєстрація</span></a>
+        </li>
+        <li>
+            <a sec:authorize="!isAuthenticated()" href="/login"><i class="fas fa-sign-in-alt"></i><span>Вхід</span></a>
+            <a sec:authorize="isAuthenticated()" href="/logout"><i class="fas fa-sign-out-alt"></i><span>Вийти</span></a>
+        </li>
+        <li sec:authorize="isAuthenticated()">
+            <a href="/profile"><i class="fas fa-user-circle"></i><span>Профіль</span></a>
+        </li>
+
+        <li sec:authorize="hasRole('ROLE_ADMIN')">
+            <a href="/admin"><i class="fas fa-lock"></i><span>Адмінка</span></a>
+        </li>
     </ul>
 </aside>
 <script th:src="@{/js/index.js}"></script>

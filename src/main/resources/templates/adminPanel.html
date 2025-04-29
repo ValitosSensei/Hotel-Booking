@@ -6,7 +6,8 @@
 </head>
 <body>
 <h1>🏨 Admin Dashboard</h1>
-
+<div th:if="${param.accessDenied}">Доступ заборонено!</div>
+<div th:if="${param.error}">Помилка: [[${param.error}]]</div>
 <!-- Sidebar -->
 <div class="sidebar">
     <div class="nav-tabs">

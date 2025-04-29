@@ -58,8 +58,13 @@ public class HotelController {
             @RequestParam(name = "sortOrder", required = false, defaultValue = "desc") String sortOrder,
             @RequestParam(name = "minRating", required = false) Double minRating,
             @RequestParam(name = "maxRating", required = false) Double maxRating,
+            Principal principal,
             Model model
     ) {
+        if (principal != null) {
+            User user = userService.getUserByEmail(principal.getName());
+            model.addAttribute("userRoles", user.getRoles());
+        }
         // Якщо вибрано "Усі міста", очищуємо фільтри
         if (city == null || city.isEmpty()) {
             minRating = null;
@@ -105,6 +110,7 @@ public class HotelController {
             model.addAttribute("currentFilter", filter);
 
             Hotel hotel = hotelService.getHotelById(hotelId);
+            model.addAttribute("hotelName", hotel.getName());
             List<Review> reviews = reviewService.getReviewsByHotel(hotel);
             model.addAttribute("reviews", reviews);
 
@@ -114,48 +120,7 @@ public class HotelController {
             return "error";
         }
     }
-//    @GetMapping("/create")
-//    public String showCreateForm(Model model) {
-//        CreateHotelWithRoomsDTO dto = new CreateHotelWithRoomsDTO();
-//
-//        dto.getRooms().add(new CreateRoomDTO());
-//        model.addAttribute("hotelDTO", dto);
-//        return "create-hotel";
-//    }
-//
-//    @PostMapping("/create")
-//    public String createHotel(
-//            @ModelAttribute("hotelDTO") CreateHotelWithRoomsDTO hotelDTO,
-//            BindingResult result,
-//            RedirectAttributes redirectAttributes
-//    ) {
-//        if (result.hasErrors()) {
-//            return "create-hotel";
-//        }
-//
-//        try {
-//            // Отримуємо користувача за ID
-//            User user = userService.getUserById(hotelDTO.getUserId());
-//
-//            // Перевіряємо ролі
-//            Set<Role> userRoles = user.getRoles();
-//            boolean isAllowed = userRoles.contains(Role.ROLE_ADMIN) || userRoles.contains(Role.ROLE_MANAGER);
-//
-//            if (!isAllowed) {
-//                redirectAttributes.addFlashAttribute("error", "Тільки адміністратори та менеджери можуть створювати готелі");
-//                return "redirect:/create";
-//            }
-//
-//            // Якщо перевірка успішна - створюємо готель
-//            hotelService.createHotelWithRooms(hotelDTO);
-//            redirectAttributes.addFlashAttribute("success", "Готель створено");
-//        } catch (RuntimeException ex) {
-//            redirectAttributes.addFlashAttribute("error", ex.getMessage());
-//            return "redirect:/create";
-//        }
-//
-//        return "redirect:/";
-//    }
+
 
     @PostMapping("/{hotelId}/reviews")
     public String submitReview(

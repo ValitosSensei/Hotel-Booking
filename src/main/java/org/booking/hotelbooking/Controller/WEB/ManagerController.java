@@ -35,17 +35,26 @@ public class ManagerController {
     @GetMapping("/hotels/{hotelId}")
     public String manageHotel(
             @PathVariable Long hotelId,
-            @RequestParam("userId") Long userId,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
             Model model
     ) {
-        User user = userService.getUserById(userId);
+        if (securityUser == null) {
+            return "redirect:/login";
+        }
+
+        // Отримання користувача з БД
+        User user = userService.getUserByEmail(securityUser.getUsername());
         if (!user.getRoles().contains(Role.ROLE_MANAGER)) {
             return "redirect:/profile?error=Доступ заборонено";
         }
 
-        Hotel hotel = hotelService.getHotelByIdAndOwnerId(hotelId, userId);
+        // Перевірка, чи готель належить менеджеру
+        Hotel hotel = hotelService.getHotelByIdAndOwnerId(hotelId, user.getId());
+        if (hotel == null) {
+            return "redirect:/profile?error=Готель не знайдено або доступ заборонено";
+        }
+
         model.addAttribute("hotel", hotel);
-        model.addAttribute("userId", userId);
         return "manage-hotel";
     }
 
@@ -64,11 +73,12 @@ public class ManagerController {
     @PostMapping("/editHotel/{hotelId}")
     public String editHotel(
             @PathVariable Long hotelId,
-            @RequestParam("userId") Long userId,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
             @ModelAttribute("hotel") Hotel hotelData,
             RedirectAttributes redirectAttributes
     ) {
-        Hotel existingHotel = hotelService.getHotelByIdAndOwnerId(hotelId, userId);
+        User user = userService.getUserByEmail(securityUser.getUsername());
+        Hotel existingHotel = hotelService.getHotelByIdAndOwnerId(hotelId, user.getId());
         existingHotel.setName(hotelData.getName());
         existingHotel.setAddress(hotelData.getAddress());
         existingHotel.setCity(hotelData.getCity());
@@ -76,32 +86,21 @@ public class ManagerController {
         existingHotel.setContactInfo(hotelData.getContactInfo());
 
         hotelService.UpdateHotel(hotelId,existingHotel);
-        redirectAttributes.addAttribute("userId", userId);
+        redirectAttributes.addAttribute("userId", user.getId());
         return "redirect:/manager/hotels/{hotelId}";
     }
 
     @GetMapping("/deleteHotel/{hotelId}")
     public String deleteHotel(
             @PathVariable Long hotelId,
-            @RequestParam("userId") Long userId,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
             RedirectAttributes redirectAttributes
     ) {
         hotelService.deleteHotel(hotelId);
-        redirectAttributes.addAttribute("userId", userId);
+        User user = userService.getUserByEmail(securityUser.getUsername());
+        redirectAttributes.addAttribute("userId", user.getId());
         return "redirect:/profile";
     }
-//
-//    @GetMapping("/editRoom/{roomId}")
-//    public String showEditRoomForm(
-//            @PathVariable Long roomId,
-//            @RequestParam("userId") Long userId,
-//            Model model
-//    ) {
-//        Room room = roomService.getRoomById(roomId);
-//        model.addAttribute("room", room);
-//        model.addAttribute("userId", userId);
-//        return "manager-edit-room";
-//    }
 
     // Додати метод для AJAX-запиту
     @GetMapping("/editRoom/{roomId}")
@@ -117,7 +116,7 @@ public class ManagerController {
     public String editRoom(
             @PathVariable Long roomId,
             @ModelAttribute Room roomData,
-            @RequestParam("userId") Long userId,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
             RedirectAttributes redirectAttributes
     ) {
         System.out.println("Отримано запит на оновлення кімнати ID: " + roomId);
@@ -128,22 +127,23 @@ public class ManagerController {
         room.setPrice(roomData.getPrice());
         room.setAvailableForDates(roomData.isAvailableForDates());
         roomService.saveRoom(room);
-
+        User user = userService.getUserByEmail(securityUser.getUsername());
         redirectAttributes.addAttribute("hotelId", room.getHotel().getId());
-        redirectAttributes.addAttribute("userId", userId);
+        redirectAttributes.addAttribute("userId", user.getId());
         return "redirect:/manager/hotels/{hotelId}";
     }
 
     @GetMapping("/hotels/{hotelId}/rooms/create")
     public String showCreateRoomForm(
             @PathVariable Long hotelId,
-            @RequestParam("userId") Long userId,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
             Model model
     ) {
         Room room = new Room();
-        room.setHotel(hotelService.getHotelByIdAndOwnerId(hotelId, userId));
+        User user = userService.getUserByEmail(securityUser.getUsername());
+        room.setHotel(hotelService.getHotelByIdAndOwnerId(hotelId, user.getId()));
         model.addAttribute("room", room);
-        model.addAttribute("userId", userId);
+        model.addAttribute("userId", user.getId());
         return "manager-create-room"; // нова HTML-сторінка
     }
 
@@ -151,15 +151,16 @@ public class ManagerController {
     @PostMapping("/hotels/{hotelId}/rooms/create")
     public String createRoom(
             @PathVariable Long hotelId,
-            @RequestParam("userId") Long userId,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
             @ModelAttribute("room") Room room,
             RedirectAttributes redirectAttributes
     ) {
-        Hotel hotel = hotelService.getHotelByIdAndOwnerId(hotelId, userId);
+        User user = userService.getUserByEmail(securityUser.getUsername());
+        Hotel hotel = hotelService.getHotelByIdAndOwnerId(hotelId, user.getId());
         room.setHotel(hotel);
         roomService.saveRoom(room);
 
-        redirectAttributes.addAttribute("userId", userId);
+        redirectAttributes.addAttribute("userId", user.getId());
         return "redirect:/manager/hotels/{hotelId}";
     }
 
@@ -206,5 +207,19 @@ public class ManagerController {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
         return "redirect:/profile";
+    }
+
+    @GetMapping("/deleteRoom/{roomId}")
+    public String deleteRoom(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
+            @RequestParam("hotelId") Long hotelId,
+            RedirectAttributes redirectAttributes
+    ) {
+        roomService.deleteRoom(roomId);
+        User user = userService.getUserByEmail(securityUser.getUsername());
+        redirectAttributes.addAttribute("hotelId", hotelId);
+        redirectAttributes.addAttribute("userId", user.getId());
+        return "redirect:/manager/hotels/{hotelId}";
     }
 }

@@ -22,10 +22,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // Тільки адміни
+                        .requestMatchers("/manager/**").hasRole("MANAGER") // Тільки менеджери
                         .requestMatchers("/{hotelId}/reviews").authenticated()
-                        .requestMatchers("/bookings/create").authenticated() // Дозвіл для бронювань
-                        .requestMatchers("/admin/searchUser").hasRole("ADMIN")
+                        .requestMatchers("/bookings/create").authenticated()
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .maximumSessions(1)
                         .expiredUrl("/login?expired=true")
                 )
+
 
                 // Вимкнення CSRF для API-запитів
                 .csrf(AbstractHttpConfigurer::disable)

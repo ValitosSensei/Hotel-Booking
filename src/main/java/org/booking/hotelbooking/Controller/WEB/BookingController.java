@@ -43,54 +43,6 @@ public class BookingController {
 
     }
 
-//    @GetMapping("/rooms/{roomId}/book")
-//    public String showBookingForm(@PathVariable Long roomId, Model model) {
-//        Room room = roomService.getRoomById(roomId);
-//        if (room == null) {
-//            throw new RuntimeException("Кімната не знайдена");
-//        }
-//
-//        Booking booking = new Booking();
-//        booking.setRoom(room);
-//        model.addAttribute("booking", booking);
-//
-//        // Додаткові дані для модального вікна
-//        model.addAttribute("room", room);
-//        model.addAttribute("hotel", room.getHotel()); // Якщо потрібно передати готель
-//
-//        return "booking-form";
-//    }
-
-//    @PostMapping("/create")
-//    public String createBooking(
-//            @ModelAttribute("booking") Booking booking,
-//            BindingResult result,
-//            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
-//            RedirectAttributes redirectAttributes
-//    ) {
-//        if (securityUser == null) {
-//            redirectAttributes.addFlashAttribute("error", "Будь ласка, увійдіть в систему");
-//            return "redirect:/login";
-//        }
-//
-//        try {
-//            // Отримати повну сутність User з бази
-//            User user = userService.getUserByEmail(securityUser.getUsername());
-//            booking.setUser(user); // Прив'язати автентифікованого користувача
-//
-//            // Валідація дат
-//            if (booking.getCheckOutDate().isBefore(booking.getCheckInDate())) {
-//                redirectAttributes.addFlashAttribute("error", "Дата виїзду має бути після дати заїзду");
-//                return "redirect:/bookings/rooms/" + booking.getRoom().getId() + "/book";
-//            }
-//
-//            bookingService.createBooking(booking);
-//            return "redirect:/bookings/success";
-//        } catch (RuntimeException ex) {
-//            redirectAttributes.addFlashAttribute("error", ex.getMessage());
-//            return "redirect:/bookings/rooms/" + booking.getRoom().getId() + "/book";
-//        }
-//    }
 
     @PostMapping("/create")
     @ResponseBody

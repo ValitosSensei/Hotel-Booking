@@ -187,6 +187,29 @@ button:hover {
     color: #2c3e50;
     transition: color 0.3s;
 }
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.edit-btn {
+    background-color: #3498db;
+    padding: 8px 15px;
+    font-size: 0.9em;
+}
+.delete-btn {
+    background-color: #e74c3c;
+    padding: 8px 15px;
+    font-size: 0.9em;
+}
+
+.edit-btn:hover {
+    background-color: #2980b9;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+}
 
 .close:hover {
     color: #e74c3c;
@@ -213,4 +236,10 @@ button:hover {
 .home-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }

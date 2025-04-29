@@ -32,7 +32,10 @@
     <p class="error-message" th:if="${errorMessage}" th:text="${errorMessage}"></p>
     <p class="success-message" th:if="${param.registered}" th:text="'Registration successful! Please login.'"></p>
 
-    <p>Already have an account? <a href="/login">Login here</a></p>
+    <div class="links">
+        <p>Already have an account? <a href="/login">Login here</a></p>
+        <p><a href="/" class="home-button">Back to Home</a></p>
+    </div>
 </div>
 
 <script th:src="@{/js/register.js}">

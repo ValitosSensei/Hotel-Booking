@@ -70,3 +70,8 @@ document.getElementById('editRoomForm').addEventListener('submit', async (e) => 
         alert('Не вдалося зберегти зміни');
     }
 });
+function confirmDeleteRoom(roomId, hotelId, userId) {
+    if (confirm("Ви впевнені, що хочете видалити цю кімнату?")) {
+        window.location.href = `/manager/deleteRoom/${roomId}?userId=${userId}&hotelId=${hotelId}`;
+    }
+}

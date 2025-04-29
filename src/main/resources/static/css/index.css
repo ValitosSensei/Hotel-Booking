@@ -40,7 +40,7 @@ header h1 {
     right: 0;
     height: auto;
     background: white;
-    width: 120px; /* Increased width for more text space */
+    width: 40px; /* Increased width for more text space */
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
@@ -118,17 +118,23 @@ header h1 {
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+.filter-group {
+    width: 100%;
+    margin-bottom: 1rem;
 }
 
 .rating-filter {
-    display: none;
+    display: flex;
+    flex-wrap: wrap; /* Переносить елементи на новий рядок */
     gap: 1rem;
-    flex-wrap: wrap;
-    justify-content: center;
+    width: 100%;
 }
 
 .filter-item {
-    flex: 1 1 200px;
+    flex: 1 1 calc(33% - 1rem); /* Рівномірний розподіл з відступами */
+    min-width: 200px; /* Мінімальна ширина для читабельності */
 }
 
 select, input[type="number"] {
@@ -137,9 +143,11 @@ select, input[type="number"] {
     border: 2px solid #e0e0e0;
     border-radius: 8px;
     font-size: 1rem;
+    box-sizing: border-box; /* Запобігає розширенню за межі */
 }
 
 .filter-btn {
+    width: auto;
     background: var(--secondary-color);
     color: white;
     border: none;
@@ -148,6 +156,7 @@ select, input[type="number"] {
     cursor: pointer;
     transition: transform 0.2s ease;
     margin-top: 1rem;
+    align-self: center;
 }
 
 .filter-btn:hover {

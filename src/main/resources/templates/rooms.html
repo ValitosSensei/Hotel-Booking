@@ -1,153 +1,136 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>Rooms in Hotel</title>
+    <title>Hotel Rooms</title>
     <link rel="stylesheet" type="text/css" href="/css/room.css">
-    <link rel="stylesheet" href="/css/booking-form.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-
-<!-- Логотип і кнопка профілю -->
 <header>
-    <div class="logo">
-        <a href="/"><img src="/images/logo.png" alt="Logo"></a>
-    </div>
-    <li><a href="/profile">View Profile</a></li>
+
+        <a href="/" class="home-link"><i class="fas fa-arrow-left"></i> На головну</a>
+        <div class="hotel-name-container">
+            <h1 class="hotel-name"><i class="fas fa-hotel"></i> <span th:text="${hotelName}"></span></h1>
+        </div>
+   
+    <nav>
+        <a href="/profile" class="profile-link"><i class="fas fa-user-circle"></i> Профіль</a>
+    </nav>
 </header>
 
 <div class="container">
-    <h1 class="title">Rooms for Hotel ID: <span th:text="${hotelId}"></span></h1>
-
-    <!-- Форма фільтрації -->
-    <form method="get" th:action="@{/{hotelId}/rooms(hotelId=${hotelId})}" class="filter-form">
-        <div>
-            <label>Дата заїзду:</label>
-            <input type="date" name="checkIn" th:value="${checkIn}">
-        </div>
-
-        <div>
-            <label>Дата виїзду:</label>
-            <input type="date" name="checkOut" th:value="${checkOut}">
-        </div>
-
-        <div>
-            <label>Статус:</label>
-            <select name="filter">
-                <option value="all" th:selected="${currentFilter == 'all'}">Всі</option>
-                <option value="available" th:selected="${currentFilter == 'available'}">Вільні</option>
-                <option value="occupied" th:selected="${currentFilter == 'occupied'}">Зайняті</option>
-            </select>
-        </div>
-
-        <button type="submit" class="button">Фільтрувати</button>
-    </form>
-
-    <!-- Таблиця кімнат -->
-    <table border="1" class="rooms-table">
-        <thead>
-        <tr>
-            <th>Номер кімнати</th>
-            <th>Тип</th>
-            <th>Ціна</th>
-            <th>Доступність</th>
-            <th>Дії</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="room : ${rooms}" class="room-row">
-            <td th:text="${room.roomNumber}"></td>
-            <td th:text="${room.type}"></td>
-            <td th:text="${room.price}"></td>
-            <td>
-                <span th:text="${room.availableForDates ? 'Вільна' : 'Зайнята'}"></span>
-            </td>
-
-            <td>
-                <button
-                        th:if="${room.availableForDates}"
-                        class="button book-button"
-                        th:attr="data-room-id=${room.id}"
-                        data-check-in="${checkIn}"
-                        data-check-out="${checkOut}"
-                >Забронювати</button>
-                <span th:unless="${room.availableForDates}">Недоступно</span>
-            </td>
-
-        </tr>
-        </tbody>
-    </table>
-
-
-
-    <div sec:authorize="isAuthenticated()" class="review-form">
-        <h2>Залишити відгук</h2>
-        <form th:action="@{/{hotelId}/reviews(hotelId=${hotelId})}" method="post">
-            <div>
-                <label>Рейтинг (1-5):</label>
-                <div class="star-rating">
-                    <input type="radio" id="star5" name="rating" value="5"><label for="star5" class="star">&#9733;</label>
-                    <input type="radio" id="star4" name="rating" value="4"><label for="star4" class="star">&#9733;</label>
-                    <input type="radio" id="star3" name="rating" value="3"><label for="star3" class="star">&#9733;</label>
-                    <input type="radio" id="star2" name="rating" value="2"><label for="star2" class="star">&#9733;</label>
-                    <input type="radio" id="star1" name="rating" value="1"><label for="star1" class="star">&#9733;</label>
-                </div>
+    <!-- Фільтри -->
+    <div class="filters-card">
+        <form method="get" th:action="@{/{hotelId}/rooms(hotelId=${hotelId})}" class="filter-form">
+            <div class="filter-item">
+                <label><i class="fas fa-calendar-day"></i> Заїзд</label>
+                <input type="date" name="checkIn" th:value="${checkIn}">
             </div>
-
-            <div>
-                <label>Коментар:</label>
-                <textarea name="comment" required class="comment-textarea"></textarea>
+            <div class="filter-item">
+                <label><i class="fas fa-calendar-times"></i> Виїзд</label>
+                <input type="date" name="checkOut" th:value="${checkOut}">
             </div>
-            <button type="submit" class="button" th:disabled="${!#authentication.isAuthenticated()}">Надіслати</button>
+            <div class="filter-item">
+                <label><i class="fas fa-filter"></i> Статус</label>
+                <select name="filter">
+                    <option value="all">Всі</option>
+                    <option value="available">Вільні</option>
+                    <option value="occupied">Зайняті</option>
+                </select>
+            </div>
+            <button type="submit" class="filter-button">
+                <i class="fas fa-sliders-h"></i> Застосувати
+            </button>
         </form>
     </div>
-    <div sec:authorize="!isAuthenticated()" class="review-form-disabled">
-        <h2>Залишити відгук</h2>
-        <p>Будь ласка, авторизуйтесь для того, щоб залишити відгук.</p>
-    </div>
 
-    <!-- Список відгуків -->
-    <h2>Відгуки</h2>
-    <div th:each="review : ${reviews}" class="review">
-        <p><strong>Користувач:</strong> <span th:text="${review.user.getFullName()}"></span></p>
-        <p><strong>Рейтинг:</strong> <span th:text="${review.rating}"></span>/5</p>
-        <p><strong>Коментар:</strong> <span th:text="${review.comment}"></span></p>
-        <p><small th:text="${#temporals.format(review.createdDate, 'dd-MM-yyyy HH:mm')}"></small></p>
-        <hr>
-    </div>
-
-
-    <!-- Додайте цей блок для відображення повідомлень -->
-    <div id="booking-message" class="hidden"></div>
-
-    <!-- Модальне вікно -->
-    <div id="booking-modal" class="modal">
-        <div class="booking-container">
-            <span class="close-modal">&times;</span>
-            <h2>Бронювання кімнати</h2>
-            <form id="booking-form" method="post" class="booking-form">
-                <input type="hidden" id="room-id" name="roomId">
-
-
-                <div class="input-group">
-                    <label>Дата заїзду:</label>
-                    <input type="date" id="check-in" name="checkInDate" required>
+    <!-- Список кімнат -->
+    <div class="rooms-grid">
+        <div th:each="room : ${rooms}" class="room-card">
+            <div class="room-header">
+                <h3><i class="fas fa-door-open"></i> Кімната <span th:text="${room.roomNumber}"></span></h3>
+                <span class="room-status" th:classappend="${room.availableForDates} ? 'available' : 'occupied'">
+                    <i class="fas fa-circle"></i>
+                    <span th:text="${room.availableForDates} ? 'ВІЛЬНА' : 'ЗАЙНЯТА'"></span>
+                </span>
+            </div>
+            <div class="room-details">
+                <p><i class="fas fa-bed"></i> Тип: <span th:text="${room.type}"></span></p>
+                <p><i class="fas fa-tag"></i> Ціна: <span th:text="${room.price}"></span>₴/ніч</p>
+            </div>
+            <div class="room-actions">
+                <button th:if="${room.availableForDates}" class="book-button" th:attr="data-room-id=${room.id}">
+                    <i class="fas fa-calendar-check"></i> Забронювати
+                </button>
+                <div th:unless="${room.availableForDates}" class="not-available">
+                    <i class="fas fa-lock"></i> Недоступно
                 </div>
-
-                <div class="input-group">
-                    <label>Дата виїзду:</label>
-                    <input type="date" id="check-out" name="checkOutDate" required>
-                </div>
-
-                <button type="submit" class="button">Підтвердити бронювання</button>
-            </form>
+            </div>
         </div>
     </div>
-    <a href="/" class="back-link">Back to Home</a>
+
+    <div class="reviews-section">
+        <h2><i class="fas fa-comments"></i> Відгуки</h2>
+        <div sec:authorize="isAuthenticated()" class="review-form">
+            <form th:action="@{/{hotelId}/reviews(hotelId=${hotelId})}" method="post">
+                <div>
+                    <label>Рейтинг (1-5):</label>
+                    <div class="star-rating">
+                        <input type="radio" id="star5" name="rating" value="5"><label for="star5" class="star">&#9733;</label>
+                        <input type="radio" id="star4" name="rating" value="4"><label for="star4" class="star">&#9733;</label>
+                        <input type="radio" id="star3" name="rating" value="3"><label for="star3" class="star">&#9733;</label>
+                        <input type="radio" id="star2" name="rating" value="2"><label for="star2" class="star">&#9733;</label>
+                        <input type="radio" id="star1" name="rating" value="1"><label for="star1" class="star">&#9733;</label>
+                    </div>
+                </div>
+                <div>
+                    <label>Коментар:</label>
+                    <textarea name="comment" required class="comment-textarea"></textarea>
+                </div>
+                <button type="submit" class="button" th:disabled="${!#authentication.isAuthenticated()}">Надіслати</button>
+            </form>
+        </div>
+
+        <div sec:authorize="!isAuthenticated()" class="review-form-disabled">
+            <h2>Залишити відгук</h2>
+            <p>Будь ласка, авторизуйтесь для того, щоб залишити відгук.</p>
+        </div>
+
+        <!-- Відгуки -->
+        <div th:each="review : ${reviews}" class="review">
+            <p><strong>Користувач:</strong> <span th:text="${review.user.getFullName()}"></span></p>
+            <p><strong>Рейтинг:</strong> <span th:text="${review.rating}"></span>/5</p>
+            <p><strong>Коментар:</strong> <span th:text="${review.comment}"></span></p>
+            <p><small th:text="${#temporals.format(review.createdDate, 'dd-MM-yyyy HH:mm')}"></small></p>
+            <hr>
+        </div>
+
+        <!-- Повідомлення -->
+        <div id="booking-message" class="hidden"></div>
+
+        <!-- Модальне вікно -->
+        <div id="booking-modal" class="modal">
+            <div class="booking-container">
+                <span class="close-modal">&times;</span>
+                <h2>Бронювання кімнати</h2>
+                <form id="booking-form" method="post" class="booking-form">
+                    <input type="hidden" id="room-id" name="roomId">
+                    <div class="input-group">
+                        <label>Дата заїзду:</label>
+                        <input type="date" id="check-in" name="checkInDate" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Дата виїзду:</label>
+                        <input type="date" id="check-out" name="checkOutDate" required>
+                    </div>
+                    <button type="submit" class="button">Підтвердити бронювання</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
-<script th:src="@{js/room.js}">
 
-
-</script>
+<!-- ПРАВИЛЬНЕ ПІДКЛЮЧЕННЯ JS -->
+<script th:src="@{/js/room.js}"></script>
 </body>
 </html>

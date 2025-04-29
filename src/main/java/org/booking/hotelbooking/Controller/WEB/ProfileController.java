@@ -9,6 +9,7 @@ import org.booking.hotelbooking.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +36,7 @@ public class ProfileController {
     }
 
     @GetMapping
+    @Transactional
     public String showProfile(@AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
                               Model model) {
         if (securityUser == null) {
