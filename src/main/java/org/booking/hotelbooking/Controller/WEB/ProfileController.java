@@ -63,12 +63,14 @@ public class ProfileController {
     @PostMapping("/request-manager")
     public String requestManagerRole(
             @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
+            @RequestParam String hotelName,
+            @RequestParam String hotelAddress,
             RedirectAttributes redirectAttributes
     ) {
         try {
             User user = userService.getUserByEmail(securityUser.getUsername());
-            userService.requestManagerRole(user.getId());
-            redirectAttributes.addFlashAttribute("message", "Запит на роль менеджера відправлено");
+            userService.requestManagerRole(user.getId(), hotelName, hotelAddress); // Оновлений метод
+            redirectAttributes.addFlashAttribute("message", "Запит відправлено! Очікуйте підтвердження.");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }

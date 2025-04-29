@@ -17,12 +17,15 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRequestRepository roleRequestRepository;
+    private final EmailService emailService;
 
     @Autowired
     public UserService(UserRepository userRepository,
-                       RoleRequestRepository roleRequestRepository) {
+                       RoleRequestRepository roleRequestRepository,
+                       EmailService emailService) {
         this.userRepository = userRepository;
         this.roleRequestRepository = roleRequestRepository;
+        this.emailService = emailService;
     }
 
     public User registerNewUser(User user) {
@@ -65,12 +68,14 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void requestManagerRole(Long userId){
+    public void requestManagerRole(Long userId, String hotelName, String hotelAddress) {
         User user = getUserById(userId);
         RoleRequest request = new RoleRequest();
         request.setUser(user);
         request.setRequestRole(Role.ROLE_MANAGER);
         request.setRequestDate(LocalDateTime.now());
+        request.setHotelName(hotelName);       // Додано
+        request.setHotelAddress(hotelAddress); // Додано
         roleRequestRepository.save(request);
     }
 
@@ -97,5 +102,17 @@ public class UserService {
     }
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public void rejectRequest(Long requestId) {
+        RoleRequest request = roleRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Запит не знайдено"));
+        roleRequestRepository.delete(request);
+
+        // Відправка листа про відхилення
+        emailService.sendRequestRejectedEmail(
+                request.getUser().getEmail(),
+                request.getHotelName()
+        );
     }
 }

@@ -83,6 +83,10 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Бронювання не знайдено"));
 
+        if (booking.getStatus() == BookingStatus.COMPLETED) {
+            throw new RuntimeException("Не можна скасувати завершене бронювання");
+        }
+
         Room room = booking.getRoom();
 
         roomRepository.save(room);
@@ -217,6 +221,7 @@ public class BookingService {
         if (!isRoomAvailable(room.getId(), request.getCheckInDate(), request.getCheckOutDate())) {
             throw new RuntimeException("Кімната вже зайнята");
         }
+
 
         Booking booking = new Booking();
         booking.setUser(user);

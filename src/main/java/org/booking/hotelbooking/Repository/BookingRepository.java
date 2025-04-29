@@ -26,4 +26,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Optional<Booking> findByConfirmationToken(String token);
     Optional<Booking> findByTransferToken(String token);
     List<Booking> findByTransferredToIsNotNull();
+    List<Booking> findByStatusIn(List<BookingStatus> statuses);
 }

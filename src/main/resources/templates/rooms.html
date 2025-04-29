@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Rooms in Hotel</title>
     <link rel="stylesheet" type="text/css" href="/room.css">
@@ -24,6 +25,11 @@
             border-radius: 8px;
             animation: fadeIn 0.3s ease-out;
         }
+        .hidden {
+            display: none;
+        }
+
+
     </style>
 </head>
 <body>
@@ -98,10 +104,9 @@
         </tbody>
     </table>
 
-    <!-- Повідомлення після відправлення відгуку -->
-    <span th:if="${flash != null and flash.success != null}">Success</span>
-    <!-- Форма для відгуку -->
-    <div th:if="${#authentication.isAuthenticated()}" class="review-form">
+
+
+    <div sec:authorize="isAuthenticated()" class="review-form">
         <h2>Залишити відгук</h2>
         <form th:action="@{/{hotelId}/reviews(hotelId=${hotelId})}" method="post">
             <div>
@@ -119,10 +124,10 @@
                 <label>Коментар:</label>
                 <textarea name="comment" required class="comment-textarea"></textarea>
             </div>
-            <button type="submit" class="button">Надіслати</button>
+            <button type="submit" class="button" th:disabled="${!#authentication.isAuthenticated()}">Надіслати</button>
         </form>
     </div>
-    <div th:if="${#authentication.isAuthenticated() == false}" class="review-form-disabled">
+    <div sec:authorize="!isAuthenticated()" class="review-form-disabled">
         <h2>Залишити відгук</h2>
         <p>Будь ласка, авторизуйтесь для того, щоб залишити відгук.</p>
     </div>
@@ -232,7 +237,7 @@
                 // Обробка HTTP-статусів
                 if (response.status === 401) {
                     alert("Будь ласка, увійдіть в систему.");
-                    window.location.href = "/login";
+
                     return;
                 }
 

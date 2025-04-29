@@ -146,3 +146,62 @@ tr:nth-child(even) {
 .tab-content-wrapper .tab-content:first-child {
     display: block;
 }
+
+
+/* Модальне вікно */
+.modal {
+    display: none; /* Приховане за замовчуванням */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    animation: fadeInBackground 0.3s ease;
+}
+
+/* Контент модального вікна */
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 40%;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    animation: slideUp 0.4s ease;
+}
+
+/* Кнопка закриття */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* Анімація для фону */
+@keyframes fadeInBackground {
+    from {background-color: rgba(0,0,0,0);}
+    to {background-color: rgba(0,0,0,0.5);}
+}
+
+/* Анімація для вмісту (випливаюче знизу) */
+@keyframes slideUp {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

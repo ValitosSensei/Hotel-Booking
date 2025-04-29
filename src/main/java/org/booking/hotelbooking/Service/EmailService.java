@@ -76,4 +76,24 @@ public class EmailService {
             throw new RuntimeException("Помилка відправки листа", e);
         }
     }
+
+    public void sendRequestRejectedEmail(String toEmail, String hotelName) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            String htmlContent = "<div style='font-family: Arial; padding: 20px;'>"
+                    + "<h2>Ваш запит на роль менеджера відхилено</h2>"
+                    + "<p>Готель: " + hotelName + "</p>"
+                    + "<p>Зв'яжіться з адміністратором для деталей.</p>"
+                    + "</div>";
+
+            helper.setTo(toEmail);
+            helper.setSubject("Запит на роль менеджера відхилено");
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Помилка відправки листа", e);
+        }
+    }
 }

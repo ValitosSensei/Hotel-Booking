@@ -1,8 +1,10 @@
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <title>Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/admin-panel.css">
+<!--    <link rel="stylesheet" href="/manager-panel.css">-->
+
 </head>
 <body>
 <h1>🏨 Admin Dashboard</h1>
@@ -52,7 +54,13 @@
                 <td th:text="${hotel.country}"></td>
                 <td th:text="${hotel.averageRating}"></td>
                 <td>
-                    <a th:href="@{/admin/editHotel/{hotelId}(hotelId=${hotel.id})}">Edit</a> |
+                    <a href="#" th:attr="data-id=${hotel.id},
+                    data-name=${hotel.name},
+                    data-address=${hotel.address},
+                    data-city=${hotel.city},
+                    data-country=${hotel.country},
+                    data-contact=${hotel.contactInfo}"
+                       onclick="openEditHotelModal(this)">Edit</a>|
                     <a th:href="@{/admin/deleteHotel/{hotelId}(hotelId=${hotel.id})}">Delete</a>
                 </td>
             </tr>
@@ -79,7 +87,12 @@
             <td th:text="${room.hotel.name}"></td>
             <td th:text="${room.price}"></td>
             <td>
-                <a th:href="@{/admin/editRoom/{roomId}(roomId=${room.id})}">Edit</a> |
+                <a href="#" th:attr="data-id=${room.id},
+                    data-number=${room.roomNumber},
+                    data-type=${room.type},
+                    data-price=${room.price},
+                    data-available=${room.availableForDates}"
+                   onclick="openEditRoomModal(this)">Edit</a> |
                 <a th:href="@{/admin/deleteRoom/{roomId}(roomId=${room.id})}">Delete</a>
             </td>
         </tr>
@@ -151,8 +164,20 @@
             <td th:text="${request.user.email}"></td>
             <td th:text="${#temporals.format(request.requestDate, 'dd-MM-yyyy HH:mm')}"></td>
             <td>
+                <!-- Використання th:attr для передачі даних -->
+                <button class="btn-view"
+                        th:attr="
+                    data-hotel-name=${request.hotelName},
+                    data-hotel-address=${request.hotelAddress},
+                    data-user-email=${request.user.email},
+                    data-request-date=${#temporals.format(request.requestDate, 'dd-MM-yyyy HH:mm')}"
+                        onclick="showRequestDetails(this)">Деталі
+                </button>
                 <form th:action="@{/admin/approve-request/{id}(id=${request.id})}" method="post">
-                    <button type="submit">Approve</button>
+                    <button type="submit">Підтвердити</button>
+                </form>
+                <form th:action="@{/admin/reject-request/{id}(id=${request.id})}" method="post">
+                    <button type="submit">Відхилити</button>
                 </form>
             </td>
         </tr>
@@ -182,7 +207,165 @@
     <div id="syncResult"></div>
 </div>
 
+<!-- Додайте цей код після розділу "Synchronization tab" -->
+<div class="modal-overlay">
+    <div id="requestDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Деталі запиту</h3>
+            <div id="modalContent">
+                <p><strong>Готель:</strong> <span id="modalHotelName"></span></p>
+                <p><strong>Адреса:</strong> <span id="modalHotelAddress"></span></p>
+                <p><strong>Користувач:</strong> <span id="modalUserEmail"></span></p>
+                <p><strong>Дата запиту:</strong> <span id="modalRequestDate"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Модальне вікно редагування готелю -->
+<div id="editHotelModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>Редагувати готель</h3>
+        <form id="hotelForm" th:action="@{/admin/editHotel/{hotelId}}" method="post">
+            <input type="hidden" name="id" id="editHotelId">
+            <input type="text" name="name" placeholder="Назва" required>
+            <input type="text" name="address" placeholder="Адреса">
+            <input type="text" name="city" placeholder="Місто">
+            <input type="text" name="country" placeholder="Країна">
+            <input type="text" name="contactInfo" placeholder="Контакти">
+            <button type="submit">Зберегти</button>
+        </form>
+    </div>
+</div>
+<!-- Модальне вікно редагування кімнати -->
+<div id="editRoomModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>Редагувати кімнату</h3>
+        <form id="roomForm" th:action="@{/admin/editRoom/{roomId}}" method="post">
+            <input type="hidden" name="id" id="editRoomId">
+            <input type="text" name="roomNumber" placeholder="Номер">
+            <input type="text" name="type" placeholder="Тип">
+            <input type="number" name="price" placeholder="Ціна">
+            <label>
+                <input type="checkbox" name="availableForDates"> Доступна
+            </label>
+            <button type="submit">Зберегти</button>
+        </form>
+    </div>
+</div>
+
 <script>
+
+    function openEditHotelModal(button) {
+        const hotel = {
+            id: button.getAttribute('data-id'),
+            name: button.getAttribute('data-name'),
+            address: button.getAttribute('data-address'),
+            city: button.getAttribute('data-city'),
+            country: button.getAttribute('data-country'),
+            contact: button.getAttribute('data-contact')
+        };
+
+        document.getElementById('editHotelId').value = hotel.id;
+        document.querySelector('#editHotelModal input[name="name"]').value = hotel.name;
+        document.querySelector('#editHotelModal input[name="address"]').value = hotel.address || '';
+        document.querySelector('#editHotelModal input[name="city"]').value = hotel.city || '';
+        document.querySelector('#editHotelModal input[name="country"]').value = hotel.country || '';
+        document.querySelector('#editHotelModal input[name="contactInfo"]').value = hotel.contact || '';
+
+        openModal('editHotelModal');
+    }
+
+    function openEditRoomModal(button) {
+        const room = {
+            id: button.getAttribute('data-id'),
+            number: button.getAttribute('data-number'),
+            type: button.getAttribute('data-type'),
+            price: button.getAttribute('data-price'),
+            available: button.getAttribute('data-available') === 'true'
+        };
+
+        document.getElementById('editRoomId').value = room.id;
+        document.querySelector('#editRoomModal input[name="roomNumber"]').value = room.number || '';
+        document.querySelector('#editRoomModal input[name="type"]').value = room.type || '';
+        document.querySelector('#editRoomModal input[name="price"]').value = room.price || '';
+        document.querySelector('#editRoomModal input[name="availableForDates"]').checked = room.available;
+
+        openModal('editRoomModal');
+    }
+
+    // Обробка форм
+    document.getElementById('hotelForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitForm(this, '/admin/editHotel/' + document.getElementById('editHotelId').value);
+    });
+
+    document.getElementById('roomForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitForm(this, '/admin/editRoom/' + document.getElementById('editRoomId').value);
+    });
+
+    function submitForm(form, action) {
+        form.action = action;
+        form.submit();
+        closeModal();
+    }
+
+    // Функція для відображення деталей
+    function showRequestDetails(button) {
+        const hotelName = button.getAttribute('data-hotel-name');
+        const hotelAddress = button.getAttribute('data-hotel-address');
+        const userEmail = button.getAttribute('data-user-email');
+        const requestDate = button.getAttribute('data-request-date');
+
+        document.getElementById('modalHotelName').textContent = hotelName;
+        document.getElementById('modalHotelAddress').textContent = hotelAddress;
+        document.getElementById('modalUserEmail').textContent = userEmail;
+        document.getElementById('modalRequestDate').textContent = requestDate;
+
+        openModal('requestDetailsModal');
+    }
+
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        const overlay = document.querySelector('.modal-overlay');
+
+        overlay.style.display = 'block';
+        modal.style.display = 'block';
+
+        setTimeout(() => {
+            overlay.style.opacity = '1';
+            modal.style.opacity = '1';
+            modal.style.transform = 'translate(-50%, -50%) scale(1)';
+        }, 10);
+    }
+
+
+    // Функція закриття модального вікна
+    function closeModal() {
+        const modals = document.querySelectorAll('.modal');
+        const overlay = document.querySelector('.modal-overlay');
+
+        modals.forEach(modal => {
+            modal.style.opacity = '0';
+            modal.style.transform = 'translate(-50%, -50%) scale(0.9)';
+        });
+
+        overlay.style.opacity = '0';
+
+        setTimeout(() => {
+            modals.forEach(modal => modal.style.display = 'none');
+            overlay.style.display = 'none';
+        }, 10);
+    }
+
+    // Закриття при кліку поза вікном
+    document.querySelector('.modal-overlay').addEventListener('click', closeModal);
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', e => e.stopPropagation());
+    });
 
     const tabs = document.querySelectorAll('.tab-link');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -215,7 +398,7 @@
                     targetContent.style.opacity = '1';
                     targetContent.style.transform = 'translateX(0)';
                 }, 50);
-            }, 300);
+            }, 50);
         });
     });
 
@@ -245,4 +428,5 @@
 </script>
 
 </body>
+
 </html>

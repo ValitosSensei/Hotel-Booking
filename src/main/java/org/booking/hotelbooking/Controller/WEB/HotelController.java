@@ -166,7 +166,7 @@ public class HotelController {
             RedirectAttributes redirectAttributes
     ) {
         if (principal == null) {
-            redirectAttributes.addFlashAttribute("error", "Ви повинні бути авторизовані для того, щоб залишити відгук.");
+//            redirectAttributes.addFlashAttribute("error", "Ви повинні бути авторизовані для того, щоб залишити відгук.");
             return "redirect:/{hotelId}/rooms";
         }
 
@@ -180,7 +180,7 @@ public class HotelController {
         // }
 
         reviewService.createOrUpdateReview(user, hotel, rating, comment);
-        redirectAttributes.addFlashAttribute("success", "Відгук збережено");
+
         return "redirect:/{hotelId}/rooms";
     }
 

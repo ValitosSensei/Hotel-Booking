@@ -137,4 +137,14 @@ public class AdminController {
         return "redirect:/admin";
     }
 
+    @PostMapping("/reject-request/{id}")
+    public String rejectRequest(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes
+    ) {
+        userService.rejectRequest(id);
+        redirectAttributes.addFlashAttribute("success", "Запит відхилено");
+        return "redirect:/admin";
+    }
+
 }
