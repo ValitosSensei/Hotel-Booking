@@ -2,28 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Hotel Booking</title>
-    <link rel="stylesheet" href="/index.css">
+    <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script>
-        function toggleFilter() {
-            const citySelect = document.querySelector("select[name='city']");
-            const ratingFields = document.querySelectorAll(".rating-filter input, .rating-filter select");
-            const ratingFilterDiv = document.querySelector(".rating-filter");
-
-            if (citySelect.value === "") {
-                ratingFields.forEach(field => field.disabled = true);
-                document.querySelector("input[name='minRating']").value = "";
-                document.querySelector("input[name='maxRating']").value = "";
-                document.querySelector("select[name='sortOrder']").value = "desc";
-                ratingFilterDiv.style.display = "none";
-            } else {
-                ratingFields.forEach(field => field.disabled = false);
-                ratingFilterDiv.style.display = "flex";
-            }
-        }
-
-        window.onload = toggleFilter;
-    </script>
 </head>
 <body>
 <div class="container">
@@ -98,5 +78,6 @@
         <li><a href="/admin"><i class="fas fa-lock"></i><span>Адмінка</span></a></li>
     </ul>
 </aside>
+<script th:src="@{/js/index.js}"></script>
 </body>
 </html>
