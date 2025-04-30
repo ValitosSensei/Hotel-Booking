@@ -26,6 +26,14 @@ public class SecurityConfig {
                         .requestMatchers("/manager/**").hasRole("MANAGER") // Тільки менеджери
                         .requestMatchers("/{hotelId}/reviews").authenticated()
                         .requestMatchers("/bookings/create").authenticated()
+                        .requestMatchers(
+                                "/favicon.ico",
+                                "/static/**",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**"
+                        ).permitAll()
+                        .requestMatchers("/bookings/create").authenticated()
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
@@ -48,15 +56,19 @@ public class SecurityConfig {
                         .maximumSessions(1)
                         .expiredUrl("/login?expired=true")
                 )
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendRedirect("/login?unauthorized=true");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.sendRedirect("/access-denied"); // Тепер це обробляється окремим контролером
+                        })
+                )
 
 
                 // Вимкнення CSRF для API-запитів
-                .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(handling -> handling
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized");
-                        })
-                );
+                .csrf(AbstractHttpConfigurer::disable);
+
 
         return http.build();
     }

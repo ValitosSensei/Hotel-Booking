@@ -52,6 +52,11 @@ public class HotelController {
         this.reviewService = reviewService;
     }
 
+    @GetMapping("/access-denied")
+    public String handleAccessDenied() {
+        return "access-denied"; // Вказує на файл access-denied.html
+    }
+
     @GetMapping("/")
     public String home(
             @RequestParam(name = "city", required = false) String city,
