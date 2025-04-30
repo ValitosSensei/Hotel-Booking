@@ -113,7 +113,7 @@ public class BookingService {
         bookingRepository.save(booking);
 
         // Відправка email
-        String confirmationLink = "http://ваш-сайт/bookings/transfer/confirm?token=" + transferToken;
+        String confirmationLink = "http://localhost:8080/bookings/transfer/confirm?token=" + transferToken;
         emailService.sendTransferConfirmationEmail(newUser.getEmail(), confirmationLink);
     }
     @Transactional

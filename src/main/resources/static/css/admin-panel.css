@@ -285,3 +285,17 @@ table th {
     margin: 10px 0;
 }
 
+#requests td button,
+#requests td form {
+    margin: 8px 5px; /* Відступи: 8px зверху/знизу, 5px зліва/справа */
+}
+
+#requests td form {
+    display: inline-block; /* Форми в одному рядку */
+    margin: 0 5px; /* Відступи між формами */
+}
+
+#requests td form button {
+    margin: 0; /* Скидання відступів для кнопок всередині форм */
+    padding: 8px 16px; /* Зручніший розмір */
+}

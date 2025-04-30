@@ -3,6 +3,7 @@ package org.booking.hotelbooking.Controller.WEB;
 import org.booking.hotelbooking.DTO.RoomDTO;
 import org.booking.hotelbooking.Entity.*;
 import org.booking.hotelbooking.Repository.RoleRequestRepository;
+import org.booking.hotelbooking.Service.EmailService;
 import org.booking.hotelbooking.Service.HotelService;
 import org.booking.hotelbooking.Service.RoomService;
 import org.booking.hotelbooking.Service.UserService;
@@ -27,6 +28,10 @@ public class AdminController {
     private final UserService userService;
     private final RoomService roomService;
     private final RoleRequestRepository roleRequestRepository;
+
+    @Autowired
+    private EmailService emailService;
+
 
     @Autowired
     public AdminController(HotelService hotelService,
@@ -111,15 +116,36 @@ public class AdminController {
     }
 
 //    ================ UserManager==================
-    @PostMapping("/approve-request/{id}")
-    public String approvedRequest(
-            @PathVariable Long id,
-            RedirectAttributes redirectAttributes
-    ){
-        userService.approveRequest(id);
-        redirectAttributes.addFlashAttribute("successs","Роль мененджера надано");
-        return "redirect:/admin";
+@PostMapping("/approve-request/{id}")
+public String approvedRequest(
+        @PathVariable Long id,
+        RedirectAttributes redirectAttributes
+) {
+    RoleRequest request = roleRequestRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Запит не знайдено"));
+
+    User user = request.getUser();
+    user.getRoles().add(Role.ROLE_MANAGER); // Додати роль
+    userService.saveUser(user); // Зберегти оновлення
+
+    userService.approveRequest(id);
+    // Отримати дані користувача та готелю
+
+    String hotelName = request.getHotelName();
+
+    // Підтвердити запит
+    userService.approveRequest(id);
+
+    // Надіслати лист
+    try {
+        emailService.sendRequestApprovedEmail(user.getEmail(), hotelName);
+        redirectAttributes.addFlashAttribute("success", "Роль менеджера надано та лист відправлено");
+    } catch (Exception e) {
+        redirectAttributes.addFlashAttribute("error", "Помилка відправки листа: " + e.getMessage());
     }
+
+    return "redirect:/admin";
+}
 
 
     @GetMapping("/searchUser")

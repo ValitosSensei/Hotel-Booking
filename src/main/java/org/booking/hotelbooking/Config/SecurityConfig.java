@@ -26,6 +26,8 @@ public class SecurityConfig {
                         .requestMatchers("/manager/**").hasRole("MANAGER") // Тільки менеджери
                         .requestMatchers("/{hotelId}/reviews").authenticated()
                         .requestMatchers("/bookings/create").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/manager/create-hotel").hasRole("MANAGER")
+                        .requestMatchers(HttpMethod.POST, "/manager/create-hotel").hasRole("MANAGER")
                         .requestMatchers(
                                 "/favicon.ico",
                                 "/static/**",

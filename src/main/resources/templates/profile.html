@@ -17,11 +17,11 @@
         </form>
     </div>
 
-    <div th:if="${message}">
-        <p style="color: green;" th:text="${message}"></p>
+    <div th:if="${message}" class="message-banner success">
+        <p th:text="${message}"></p>
     </div>
-    <div th:if="${error}">
-        <p style="color: red;" th:text="${error}"></p>
+    <div th:if="${error}" class="message-banner error">
+        <p th:text="${error}"></p>
     </div>
 
     <div class="main-container">
@@ -44,7 +44,7 @@
         <div class="tab-content-wrapper">
             <div id="personalInfo" class="tab-content">
                 <h2>Personal Information</h2>
-                <p>ID: <span th:text="${user.id}"></span></p>
+                <p hidden="hidden">ID: <span th:text="${user.id}"></span></p>
                 <p>Name: <span th:text="${user.firstName + ' ' + user.lastName}"></span></p>
                 <p>Email: <span th:text="${user.email}"></span></p>
                 <p>Phone: <span th:text="${user.phone}"></span></p>
@@ -165,6 +165,8 @@
         </form>
     </div>
     <div class="modal-overlay" onclick="closeModal()"></div>
+
+
     <script th:src="@{/js/profile.js}">
 
     </script>

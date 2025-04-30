@@ -23,6 +23,13 @@ function openManagerRequestModal() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+
+    setTimeout(() => {
+        const banners = document.querySelectorAll('.message-banner');
+        banners.forEach(banner => {
+            banner.remove();
+        });
+    }, 5000);
     const modal = document.getElementById('managerRequestModal');
     const closeModal = document.querySelector('.close');
     const openModalButton = document.querySelector('button[onclick="openManagerRequestModal()"]');
@@ -72,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Щоб після завантаження сторінки була активна перша вкладка
     document.getElementById('personalInfo').style.display = 'block';
+
 });
 
 function openTransferModal(bookingId) {

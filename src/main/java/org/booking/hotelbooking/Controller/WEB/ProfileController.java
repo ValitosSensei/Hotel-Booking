@@ -1,5 +1,6 @@
 package org.booking.hotelbooking.Controller.WEB;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.booking.hotelbooking.Entity.Hotel;
 import org.booking.hotelbooking.Entity.Role;
 import org.booking.hotelbooking.Entity.User;
@@ -67,14 +68,18 @@ public class ProfileController {
             @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
             @RequestParam String hotelName,
             @RequestParam String hotelAddress,
-            RedirectAttributes redirectAttributes
+            RedirectAttributes redirectAttributes,
+            HttpServletRequest request
     ) {
         try {
             User user = userService.getUserByEmail(securityUser.getUsername());
             userService.requestManagerRole(user.getId(), hotelName, hotelAddress); // Оновлений метод
             redirectAttributes.addFlashAttribute("message", "Запит відправлено! Очікуйте підтвердження.");
+            System.out.println("Відправлено повідомлення: " + "Запит відправлено! Очікуйте підтвердження.");
+            request.getSession().setAttribute("showMessageModal", "Запит відправлено! Очікуйте підтвердження.");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            System.out.println("Відправлено помилку: " + ex.getMessage());
         }
         return "redirect:/profile";
     }
