@@ -2,71 +2,213 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Створити готель</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <!-- Bootstrap для базового стилю -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+    <!-- Анімації -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+        body {
+            background: #f9f9f9;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #007BFF;
+        }
+
+        form {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .upload-zone {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            margin: 15px 0;
+            border-radius: 10px;
+            background-color: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone.dragover {
+            border-color: #007BFF;
+            background-color: #e3f2fd;
+        }
+
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .preview-item {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .room-block {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background-color: #f1f1f1;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
-<h1>Створити готель</h1>
+
+<h1 class="animate__animated animate__fadeInDown">Створити готель</h1>
 
 <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-<form th:action="@{/manager/create-hotel}" th:object="${hotelDTO}" method="post">
-    <input type="hidden" th:field="*{userId}" />
-    <label>Назва:</label>
-    <input type="text" th:field="*{name}" required/><br/>
+<form th:action="@{/manager/create-hotel}" th:object="${hotelDTO}" method="post" enctype="multipart/form-data">
 
-    <label>Адреса:</label>
-    <input type="text" th:field="*{address}" required/><br/>
+    <input type="hidden" th:field="*{userId}"/>
 
-    <label>Місто:</label>
-    <input type="text" th:field="*{city}" required/><br/>
+    <div class="mb-3">
+        <label>Назва:</label>
+        <input type="text" th:field="*{name}" class="form-control" required/>
+    </div>
 
-    <label>Країна:</label>
-    <input type="text" th:field="*{country}" required/><br/>
+    <div class="mb-3">
+        <label>Адреса:</label>
+        <input type="text" th:field="*{address}" class="form-control" required/>
+    </div>
 
-    <label>Контактна інформація:</label>
-    <input type="text" th:field="*{contactInfo}" required/><br/>
+    <div class="mb-3">
+        <label>Місто:</label>
+        <input type="text" th:field="*{city}" class="form-control" required/>
+    </div>
 
-    <h3>Кімнати</h3>
-    <div id="rooms">
-        <div th:each="room, iStat : *{rooms}">
+    <div class="mb-3">
+        <label>Країна:</label>
+        <input type="text" th:field="*{country}" class="form-control" required/>
+    </div>
 
+    <div class="mb-3">
+        <label>Контактна інформація:</label>
+        <input type="text" th:field="*{contactInfo}" class="form-control" required/>
+    </div>
+
+    <div class="mb-3">
+        <label>Фотографії готелю:</label>
+        <div class="upload-zone" id="dropZone">
+            Перетягніть файли сюди або <u>клікніть для вибору</u>
+            <input type="file" id="fileInput" name="photos" multiple accept="image/*" style="display: none;">
+        </div>
+        <div class="preview-container" id="previewContainer"></div>
+    </div>
+
+    <h4 class="mt-4">Кімнати</h4>
+    <div id="rooms" class="animate__animated animate__fadeIn">
+        <div th:each="room, iStat : *{rooms}" class="room-block">
             <label>Номер кімнати:</label>
-            <input type="text" th:field="*{rooms[__${iStat.index}__].roomNumber}" required/><br/>
+            <input type="text" th:field="*{rooms[__${iStat.index}__].roomNumber}" class="form-control" required/>
 
             <label>Тип:</label>
-            <input type="text" th:field="*{rooms[__${iStat.index}__].type}" required/><br/>
+            <input type="text" th:field="*{rooms[__${iStat.index}__].type}" class="form-control" required/>
 
             <label>Ціна:</label>
-            <input type="number" step="0.01" th:field="*{rooms[__${iStat.index}__].price}" required/><br/>
+            <input type="number" step="0.01" th:field="*{rooms[__${iStat.index}__].price}" class="form-control" required/>
 
             <label>Доступна:</label>
-            <input type="checkbox" th:field="*{rooms[__${iStat.index}__].availableForDates}" /><br/>
-
-            <hr/>
+            <input type="checkbox" th:field="*{rooms[__${iStat.index}__].availableForDates}" class="form-check-input"/>
         </div>
     </div>
 
-    <button type="button" onclick="addRoom()">+ Додати кімнату</button><br/><br/>
-    <button type="submit">Створити</button>
+    <button type="button" class="btn btn-outline-primary mt-2" onclick="addRoom()">+ Додати кімнату</button>
+    <button type="submit" class="btn btn-success">Створити</button>
 </form>
 
+<!-- Скрипти -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('previewContainer');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        handleFiles(files);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+        for (const file of files) {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('preview-item');
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+
     let roomIndex = [[${hotelDTO.rooms.size()} ?: 0]];
+
     function addRoom() {
         const roomHtml = `
-        <div>
+        <div class="room-block animate__animated animate__fadeInUp">
             <label>Номер кімнати:</label>
-            <input type="text" name="rooms[${roomIndex}].roomNumber" required/><br/>
+            <input type="text" name="rooms[${roomIndex}].roomNumber" class="form-control" required/>
 
             <label>Тип:</label>
-            <input type="text" name="rooms[${roomIndex}].type" required/><br/>
+            <input type="text" name="rooms[${roomIndex}].type" class="form-control" required/>
 
             <label>Ціна:</label>
-            <input type="number" step="0.01" name="rooms[${roomIndex}].price" required/><br/>
+            <input type="number" step="0.01" name="rooms[${roomIndex}].price" class="form-control" required/>
 
             <label>Доступна:</label>
-            <input type="checkbox" name="rooms[${roomIndex}].available"/><br/>
-            <hr/>
+            <input type="checkbox" name="rooms[${roomIndex}].availableForDates" class="form-check-input"/>
         </div>`;
         $("#rooms").append(roomHtml);
         roomIndex++;

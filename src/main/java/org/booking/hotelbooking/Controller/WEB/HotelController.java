@@ -109,8 +109,12 @@ public class HotelController {
             model.addAttribute("checkOut", checkOut);
             model.addAttribute("currentFilter", filter);
 
+
             Hotel hotel = hotelService.getHotelById(hotelId);
+            List<String> hotelPhotos = hotel.getPhotoUrls() != null ? hotel.getPhotoUrls() : Collections.emptyList();
+            model.addAttribute("hotelPhotos", hotelPhotos);
             model.addAttribute("hotelName", hotel.getName());
+            model.addAttribute("hotelPhotos", hotel.getPhotoUrls());
             List<Review> reviews = reviewService.getReviewsByHotel(hotel);
             model.addAttribute("reviews", reviews);
 

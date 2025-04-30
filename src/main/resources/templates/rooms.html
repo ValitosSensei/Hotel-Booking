@@ -18,7 +18,39 @@
     </nav>
 </header>
 
+
+
 <div class="container">
+    <section class="hotel-carousel">
+        <div class="carousel-container">
+            <div th:if="${not #lists.isEmpty(hotelPhotos)}">
+                <div class="carousel-track">
+                    <div th:each="photo, iter : ${hotelPhotos}"
+                         class="carousel-slide"
+                         th:classappend="${iter.index == 0} ? 'active'">
+                        <img th:src="@{${photo}}" alt="Hotel Photo" class="gallery-image">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопки навігації -->
+            <button class="carousel-button prev"><i class="fas fa-chevron-left fa-2x"></i></button>
+            <button class="carousel-button next"><i class="fas fa-chevron-right fa-2x"></i></button>
+
+            <!-- Індикатори -->
+            <div class="carousel-indicators" th:if="${not #lists.isEmpty(hotelPhotos)}">
+            <span th:each="photo, iter : ${hotelPhotos}"
+                  class="dot"
+                  th:classappend="${iter.index == 0} ? 'active'"
+                  th:onclick="|showSlide(${iter.index})|"></span>
+            </div>
+
+            <!-- Заглушка якщо нема фото -->
+            <div th:if="${#lists.isEmpty(hotelPhotos)}" class="no-photos">
+                <img src="https://via.placeholder.com/800x600.png?text=No+Photos" alt="No Photos">
+            </div>
+        </div>
+    </section>
     <!-- Фільтри -->
     <div class="filters-card">
         <form method="get" th:action="@{/{hotelId}/rooms(hotelId=${hotelId})}" class="filter-form">
@@ -128,6 +160,11 @@
             </div>
         </div>
     </div>
+</div>
+<div id="photo-modal" class="modal">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="expanded-img"
+         th:src="${not #lists.isEmpty(hotelPhotos)} ? @{${hotelPhotos[0]}} : ''">
 </div>
 
 <!-- ПРАВИЛЬНЕ ПІДКЛЮЧЕННЯ JS -->

@@ -42,6 +42,14 @@
         <section class="hotels-section">
             <div class="hotels-grid">
                 <div class="hotel-card" th:each="hotel : ${hotels}">
+                    <div class="hotel-image">
+                        <img th:if="${not #lists.isEmpty(hotel.photoUrls)}"
+                             th:src="${hotel.photoUrls[0]}"
+                             alt="Hotel Image">
+                        <img th:unless="${not #lists.isEmpty(hotel.photoUrls)}"
+                             src="https://picsum.photos/800/600?text=Hotel+Image"
+                             alt="Default Hotel Image">
+                    </div>
                     <div class="card-header">
                         <h3 th:text="${hotel.name}"></h3>
                         <div class="rating">

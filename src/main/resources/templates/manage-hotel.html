@@ -74,7 +74,26 @@
             </div>
     </div>
 
+    <div id="hotelPhotos" class="tab">
+        <div class="photos-section">
+            <h2>Управління фотографіями</h2>
+            <div class="photo-grid">
+                <div th:each="photo : ${hotel.photoUrls}" class="photo-card">
+                    <img th:src="${photo}" class="photo-thumbnail">
+                    <button class="delete-btn"
+                            th:attr="data-photo=${photo}, data-hotel-id=${hotel.id}"
+                            onclick="deletePhoto(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <button class="add-photo-btn" onclick="openModal('uploadPhotoModal')">
+                <i class="fas fa-plus"></i> Додати фото
+            </button>
+        </div>
+    </div>
 </div>
+
 
 <!-- Модальні вікна редагування -->
 <div id="editHotelModal" class="modal">
@@ -123,6 +142,23 @@
         </div>
         <button type="submit">Зберегти</button>
         <button type="button" onclick="closeModal()">Скасувати</button>
+    </form>
+</div>
+
+<div id="uploadPhotoModal" class="modal">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2>Завантажити нові фото</h2>
+    <form th:action="@{/manager/hotels/{hotelId}/photos(hotelId=${hotel.id})}"
+          method="post"
+          enctype="multipart/form-data"
+          id="uploadForm">
+        <div class="upload-zone" id="uploadZone">
+            <input type="file" id="fileInput" name="photos" multiple hidden>
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Перетягніть фото або клікніть для вибору</p>
+        </div>
+        <div class="preview-grid" id="previewGrid"></div>
+        <button type="submit" class="upload-btn">Завантажити</button>
     </form>
 </div>
 

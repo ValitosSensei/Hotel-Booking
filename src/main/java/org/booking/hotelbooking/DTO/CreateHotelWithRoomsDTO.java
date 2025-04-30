@@ -1,5 +1,7 @@
 package org.booking.hotelbooking.DTO;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,8 +14,25 @@ public class CreateHotelWithRoomsDTO {
     private List<CreateRoomDTO> rooms = new ArrayList<>();
     private Long userId;
 
+    private List<String> photoUrls = new ArrayList<>();
+    private List<MultipartFile> photos = new ArrayList<>(); // Замінити photoUrls на photos
+
+    public List<MultipartFile> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<MultipartFile> photos) {
+        this.photos = photos;
+    }
     public Long getUserId() {
         return userId;
+    }
+    public List<String> getPhotoUrls() {
+        return photoUrls;
+    }
+
+    public void setPhotoUrls(List<String> photoUrls) {
+        this.photoUrls = photoUrls;
     }
 
     public void setUserId(Long userId) {

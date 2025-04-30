@@ -15,7 +15,17 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/manager")
@@ -183,29 +193,41 @@ public class ManagerController {
             @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
             RedirectAttributes redirectAttributes
     ) {
-        // Перевірка автентифікації
         if (securityUser == null) {
             redirectAttributes.addFlashAttribute("error", "Будь ласка, увійдіть у систему");
             return "redirect:/login";
         }
 
-        // Отримання користувача
         User user = userService.getUserByEmail(securityUser.getUsername());
         if (user == null) {
             redirectAttributes.addFlashAttribute("error", "Користувач не знайдений");
             return "redirect:/profile";
         }
 
-        // Встановлення userId
-        hotelDTO.setUserId(user.getId());
-        System.out.println("Переданий userId: " + hotelDTO.getUserId()); // Логування
+        // Встановлення userId перед використанням
+        hotelDTO.setUserId(user.getId()); // Переміщено сюди
 
         try {
+            List<String> photoUrls = new ArrayList<>();
+            if (hotelDTO.getPhotos() != null) { // Додано перевірку на null
+                for (MultipartFile file : hotelDTO.getPhotos()) {
+                    if (!file.isEmpty()) {
+                        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                        Path uploadPath = Paths.get("uploads/" + fileName);
+                        Files.createDirectories(uploadPath.getParent());
+                        Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+                        photoUrls.add("/uploads/" + fileName);
+                    }
+                }
+            }
+            hotelDTO.setPhotoUrls(photoUrls);
+
             hotelService.createHotelWithRooms(hotelDTO);
             redirectAttributes.addFlashAttribute("success", "Готель створено!");
-        } catch (RuntimeException ex) {
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error", "Помилка завантаження файлів: " + ex.getMessage());
         }
+
         return "redirect:/profile";
     }
 
@@ -221,5 +243,62 @@ public class ManagerController {
         redirectAttributes.addAttribute("hotelId", hotelId);
         redirectAttributes.addAttribute("userId", user.getId());
         return "redirect:/manager/hotels/{hotelId}";
+    }
+
+    @PostMapping("/hotels/{hotelId}/photos")
+    public String uploadPhotos(
+            @PathVariable Long hotelId,
+            @RequestParam("photos") MultipartFile[] files,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
+            RedirectAttributes redirectAttributes) throws IOException {
+
+        User user = userService.getUserByEmail(securityUser.getUsername());
+        Hotel hotel = hotelService.getHotelByIdAndOwnerId(hotelId, user.getId());
+        List<String> newPhotos = processUploadedFiles(files);
+
+        List<String> updatedPhotos = new ArrayList<>(hotel.getPhotoUrls());
+        updatedPhotos.addAll(newPhotos);
+
+        hotel.setPhotoUrls(updatedPhotos);
+        hotelService.UpdateHotel(hotelId, hotel);
+
+        redirectAttributes.addFlashAttribute("success", "Фото успішно додані");
+        return "redirect:/manager/hotels/" + hotelId;
+    }
+
+    // Видалення фото
+    @PostMapping("/hotels/{hotelId}/photos/delete")
+    public String deletePhoto(
+            @PathVariable Long hotelId,
+            @RequestParam String photoUrl,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User securityUser,
+            RedirectAttributes redirectAttributes) {
+
+        System.out.println("Deleting photo: " + photoUrl); // Логування
+        User user = userService.getUserByEmail(securityUser.getUsername());
+        Hotel hotel = hotelService.getHotelByIdAndOwnerId(hotelId, user.getId());
+
+        List<String> updatedPhotos = new ArrayList<>(hotel.getPhotoUrls());
+        updatedPhotos.remove(photoUrl);
+
+        hotel.setPhotoUrls(updatedPhotos);
+        hotelService.UpdateHotel(hotelId, hotel);
+
+        redirectAttributes.addFlashAttribute("success", "Фото видалено");
+        return "redirect:/manager/hotels/" + hotelId;
+    }
+
+    private List<String> processUploadedFiles(MultipartFile[] files) throws IOException {
+        List<String> photoUrls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            if (!file.isEmpty()) {
+                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                Path uploadPath = Paths.get("uploads/" + fileName);
+                Files.createDirectories(uploadPath.getParent());
+                Files.copy(file.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+                photoUrls.add("/uploads/" + fileName);
+            }
+        }
+        return photoUrls;
     }
 }

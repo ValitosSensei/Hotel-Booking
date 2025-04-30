@@ -75,3 +75,71 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+document.querySelectorAll('.carousel-slide img').forEach(img => {
+    img.addEventListener('click', function() {
+        const modal = document.getElementById('photo-modal');
+        const modalImg = document.getElementById('expanded-img');
+        modal.style.display = "flex";
+        modalImg.src = this.src;
+    });
+});
+
+document.querySelector('#photo-modal .close-modal').addEventListener('click', () => {
+    document.getElementById('photo-modal').style.display = "none";
+});
+let currentSlide = 0;
+let autoPlayInterval;
+
+function showSlide(index) {
+    const track = document.querySelector('.carousel-track');
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.dot');
+
+    currentSlide = (index + slides.length) % slides.length;
+    const offset = -currentSlide * 100;
+    track.style.transform = `translateX(${offset}%)`; /* Горизонтальний зсув */
+
+    dots.forEach(dot => dot.classList.remove('active'));
+    dots[currentSlide].classList.add('active');
+}
+
+function nextSlide() {
+    showSlide(currentSlide + 1);
+}
+
+function prevSlide() {
+    showSlide(currentSlide - 1);
+}
+
+// Автоплеї
+function startAutoPlay() {
+    autoPlayInterval = setInterval(nextSlide, 10000);
+}
+
+function stopAutoPlay() {
+    clearInterval(autoPlayInterval);
+}
+
+// Обробка подій
+document.querySelector('.carousel-button.next').addEventListener('click', () => {
+    nextSlide();
+    stopAutoPlay();
+    startAutoPlay();
+});
+
+document.querySelector('.carousel-button.prev').addEventListener('click', () => {
+    prevSlide();
+    stopAutoPlay();
+    startAutoPlay();
+});
+
+// Ініціалізація
+document.addEventListener("DOMContentLoaded", function() {
+    if (document.querySelector('.carousel-slide')) {
+        showSlide(0);
+        startAutoPlay();
+    }
+});
+
+document.querySelector('.carousel-container').addEventListener('mouseenter', stopAutoPlay);
+document.querySelector('.carousel-container').addEventListener('mouseleave', startAutoPlay);

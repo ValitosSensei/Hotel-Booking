@@ -55,11 +55,18 @@ public class Hotel {
         this.owner = owner;
     }
 
+
+    @ElementCollection
+    private List<String> photoUrls = new ArrayList<>();
+
     public Hotel(){
 
     }
 
-    public Hotel(Long id, String name, String address, String city, String country, String contactInfo, List<Room> rooms, List<Review> reviews) {
+    public Hotel(Long id, String name, String address, String city,
+                 String country, String contactInfo, List<Room> rooms,
+                 List<Review> reviews, User owner, boolean availableForDates,
+                 List<String> photoUrls) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -68,6 +75,17 @@ public class Hotel {
         this.contactInfo = contactInfo;
         this.rooms = rooms;
         this.reviews = reviews;
+        this.owner = owner;
+        this.availableForDates = availableForDates;
+        this.photoUrls = photoUrls;
+    }
+
+    public List<String> getPhotoUrls() {
+        return photoUrls;
+    }
+
+    public void setPhotoUrls(List<String> photoUrls) {
+        this.photoUrls = photoUrls;
     }
 
     public Long getId() {

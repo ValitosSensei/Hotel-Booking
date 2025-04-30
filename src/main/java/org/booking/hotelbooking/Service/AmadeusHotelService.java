@@ -3,6 +3,10 @@ package org.booking.hotelbooking.Service;
 import com.amadeus.Amadeus;
 import com.amadeus.Params;
 import com.amadeus.resources.Hotel;  // Амадеус готель
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.booking.hotelbooking.Entity.Review;
 import org.booking.hotelbooking.Entity.Room;
 import org.booking.hotelbooking.Entity.User;
@@ -68,6 +72,8 @@ public class AmadeusHotelService {
             hotel.setCountry(country);
             hotel.setContactInfo("Not provided");
 
+            List<String> photos = generateHotelPhotos(3 + random.nextInt(3)); // 3-5 фото
+            hotel.setPhotoUrls(photos);
 
 
             // Замініть блок генерації відгуків:
@@ -144,5 +150,31 @@ public class AmadeusHotelService {
     private String getRandomRoomType() {
         String[] types = {"Standard", "Deluxe", "Suite", "Single", "Double"};
         return types[random.nextInt(types.length)];
+    }
+    private List<String> generateHotelPhotos(int count) {
+        List<String> photos = new ArrayList<>();
+        String accessKey = "hygmPhoerF9qfIg5gpYrsjdG6pMnIOsNt1zzATI4-CM"; // Замініть на ваш ключ
+        try {
+            String apiUrl = "https://api.unsplash.com/photos/random?query=hotel&count=" + count + "&client_id=" + accessKey;
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(apiUrl))
+                    .build();
+
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            JsonArray jsonArray = JsonParser.parseString(response.body()).getAsJsonArray();
+
+            for (JsonElement element : jsonArray) {
+                JsonObject photo = element.getAsJsonObject();
+                String url = photo.getAsJsonObject("urls").get("regular").getAsString();
+                photos.add(url);
+            }
+        } catch (Exception e) {
+            // Резервний варіант: Picsum з тематичними фото
+            for (int i = 0; i < count; i++) {
+                int imageId = 1000 + random.nextInt(9000); // ID для різних фото
+                photos.add("https://picsum.photos/seed/hotel-" + imageId + "/800/600");
+            }
+        }
+        return photos;
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,15 @@ public class HotelService {
         hotel.setContactInfo(dto.getContactInfo());
         hotel.setOwner(manager);
 
+        // Обробка фото
+        if (dto.getPhotoUrls() != null && !dto.getPhotoUrls().isEmpty()) {
+            hotel.setPhotoUrls(dto.getPhotoUrls());
+//            List<String> photos = Arrays.stream(dto.getPhotoUrls().get(0).split(","))
+//                    .map(String::trim)
+//                    .filter(url -> !url.isEmpty())
+//                    .collect(Collectors.toList());
+//            hotel.setPhotoUrls(photos);
+        }
         Hotel savedHotel = hotelRepository.save(hotel);
 
         // Збереження кімнат

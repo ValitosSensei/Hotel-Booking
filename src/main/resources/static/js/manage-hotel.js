@@ -75,3 +75,59 @@ function confirmDeleteRoom(roomId, hotelId, userId) {
         window.location.href = `/manager/deleteRoom/${roomId}?userId=${userId}&hotelId=${hotelId}`;
     }
 }
+// Drag & drop для завантаження фото
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const previewGrid = document.getElementById('previewGrid');
+
+uploadZone.addEventListener('click', () => fileInput.click());
+
+uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.style.borderColor = '#2980b9';
+});
+
+uploadZone.addEventListener('dragleave', () => {
+    uploadZone.style.borderColor = '#3498db';
+});
+
+uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    handleFiles(e.dataTransfer.files);
+});
+
+fileInput.addEventListener('change', (e) => {
+    handleFiles(e.target.files);
+});
+
+function handleFiles(files) {
+    previewGrid.innerHTML = '';
+    Array.from(files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.classList.add('preview-item');
+                previewGrid.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+// Видалення фото
+function deletePhoto(buttonElement) {
+    const photoUrl = buttonElement.dataset.photo;
+    const hotelId = buttonElement.dataset.hotelId;
+    if (confirm('Видалити це фото?')) {
+        fetch(`/manager/hotels/${hotelId}/photos/delete?photoUrl=${encodeURIComponent(photoUrl)}`, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (response.ok) location.reload();
+                else alert('Помилка видалення');
+            })
+            .catch(error => console.error('Error:', error));
+    }
+}

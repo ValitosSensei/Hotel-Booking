@@ -166,3 +166,21 @@ document.getElementById('userSearchForm').addEventListener('submit', function(e)
                 <tr><td colspan="3">Помилка завантаження</td></tr>`;
         });
 });
+document.getElementById('syncForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const cityCode = document.getElementById('cityCode').value;
+
+    fetch(`/api/hotels/sync?cityCode=${encodeURIComponent(cityCode)}`, {
+        method: 'POST'
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Помилка синхронізації');
+            return response.text();
+        })
+        .then(message => {
+            document.getElementById('syncResult').innerHTML = `<div class="success">${message}</div>`;
+        })
+        .catch(error => {
+            document.getElementById('syncResult').innerHTML = `<div class="error">${error.message}</div>`;
+        });
+});
