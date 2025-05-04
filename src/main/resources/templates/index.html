@@ -16,7 +16,7 @@
             <div class="filters-container">
                 <div class="filter-group">
                     <select name="city" th:onchange="this.form.submit(); toggleFilter();">
-                        <option value="">All Cities</option>
+                        <option value="">Всі міста</option>
                         <option th:each="city : ${cities}" th:value="${city}" th:text="${city}" th:selected="${selectedCity == city}"></option>
                     </select>
                 </div>
@@ -24,8 +24,8 @@
                 <div class="rating-filter">
                     <div class="filter-item">
                         <select name="sortOrder" onchange="this.form.submit()">
-                            <option value="desc" th:selected="${sortOrder == 'desc'}">Rating: High to Low</option>
-                            <option value="asc" th:selected="${sortOrder == 'asc'}">Rating: Low to High</option>
+                            <option value="desc" th:selected="${sortOrder == 'desc'}">Рейтинг: Від високого</option>
+                            <option value="asc" th:selected="${sortOrder == 'asc'}">Рейтинг: Від низького</option>
                         </select>
                     </div>
                     <div class="filter-item">
@@ -35,7 +35,7 @@
                         <input type="number" step="0.1" name="maxRating" th:value="${maxRating}" placeholder="Max rating" />
                     </div>
                 </div>
-                <button type="submit" class="filter-btn">Apply Filters</button>
+                <button type="submit" class="filter-btn">Застосувати</button>
             </div>
         </form>
 
@@ -64,7 +64,7 @@
                         <p><i class="fas fa-phone"></i> <span th:text="${hotel.contactInfo}"></span></p>
                     </div>
                     <a th:href="@{/{hotelId}/rooms(hotelId=${hotel.id})}" class="rooms-btn">
-                        View Rooms <i class="fas fa-arrow-right"></i>
+                        Переглянути кімнати<i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
             </div>

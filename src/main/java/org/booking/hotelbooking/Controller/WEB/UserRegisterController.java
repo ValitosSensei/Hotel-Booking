@@ -5,10 +5,7 @@ import org.booking.hotelbooking.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/register")
@@ -27,11 +24,15 @@ public class UserRegisterController {
     }
 
     @PostMapping
-    public String registerUser(@ModelAttribute("user") User user, Model model) {
+    public String registerUser(@ModelAttribute("user") User user,
+                               Model model,
+                               @RequestParam("fullPhone") String fullPhone) {
         try {
+            user.setPhone(fullPhone);
             userService.registerNewUser(user);
             return "redirect:/login?registered=true";
         } catch (RuntimeException ex) {
+
             model.addAttribute("errorMessage", ex.getMessage());
             return "register";
         }

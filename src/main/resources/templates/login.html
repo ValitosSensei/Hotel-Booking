@@ -9,23 +9,23 @@
 </head>
 <body>
 <div class="form-container">
-    <h2>Welcome Back</h2>
+    <h2>Ласкаво просимо</h2>
     <form action="/login" method="post" class="form">
-        <label for="email">Email:</label>
+        <label for="email">Електронна пошта:</label>
         <input type="text" id="email" name="email" required><br>
 
-        <label for="password">Password:</label>
+        <label for="password">Пароль:</label>
         <input type="password" id="password" name="password" required><br>
 
-        <button type="submit">Login</button>
+        <button type="submit">Увійти</button>
     </form>
 
     <p class="error-message" th:if="${errorMessage}" th:text="${errorMessage}"></p>
     <p class="success-message" th:if="${message}" th:text="${message}"></p>
 
     <div class="links">
-        <p>Don't have an account? <a href="/register">Register here</a></p>
-        <p><a href="/" class="home-button">Back to Home</a></p>
+        <p>Не маєте облікового запису? <a href="/register">Зареєструйтесь тут</a></p>
+        <p><a href="/" class="home-button">Повернутися на головну</a></p>
     </div>
 </div>
 
