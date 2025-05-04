@@ -25,7 +25,19 @@ public class RoleRequest {
     private String hotelName;
     private String hotelAddress;
 
-    public RoleRequest(Long id, User user, Role requestRole, LocalDateTime requestDate, boolean isApproved, String hotelName, String hotelAddress) {
+    private boolean rejected = false;
+
+    // Геттер та сеттер
+    public boolean isRejected() {
+        return rejected;
+    }
+
+    public void setRejected(boolean rejected) {
+        this.rejected = rejected;
+    }
+
+    public RoleRequest(Long id, User user, Role requestRole, LocalDateTime requestDate, boolean isApproved, String hotelName, String hotelAddress,
+                       boolean rejected) {
         this.id = id;
         this.user = user;
         this.requestRole = requestRole;
@@ -33,6 +45,7 @@ public class RoleRequest {
         this.isApproved = isApproved;
         this.hotelName = hotelName;
         this.hotelAddress = hotelAddress;
+        this.rejected = rejected;
     }
 
     public RoleRequest() {}

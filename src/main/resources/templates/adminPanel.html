@@ -175,9 +175,14 @@
                 <form th:action="@{/admin/approve-request/{id}(id=${request.id})}" method="post">
                     <button type="submit">Підтвердити</button>
                 </form>
-                <form th:action="@{/admin/reject-request/{id}(id=${request.id})}" method="post">
-                    <button type="submit">Відхилити</button>
-                </form>
+                <button
+                        class="btn-view"
+                        th:attr="data-request-id=${request.id}"
+                        onclick="openRejectModal(this)"
+                >
+                    Відхилити
+                </button>
+
             </td>
         </tr>
         </tbody>
@@ -251,6 +256,21 @@
                 <input type="checkbox" name="availableForDates"> Доступна
             </label>
             <button type="submit">Зберегти</button>
+        </form>
+    </div>
+</div>
+
+<div id="rejectCommentModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>Введіть причину відхилення</h3>
+        <form id="rejectForm" method="post">
+            <input type="hidden" id="rejectRequestId">
+            <textarea id="rejectComment" name="comment"
+                      placeholder="Обов'язкова причина..."
+                      rows="4"
+                      style="width: 100%; margin: 10px 0;"></textarea>
+            <button type="submit">Відхилити</button>
         </form>
     </div>
 </div>

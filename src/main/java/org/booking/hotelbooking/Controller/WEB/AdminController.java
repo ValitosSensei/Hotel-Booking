@@ -49,7 +49,7 @@ public class AdminController {
 
         List<Hotel> hotels = hotelService.listHotel();
         List<Room> rooms = roomService.getAllRooms();
-        List<RoleRequest> requests = roleRequestRepository.findByIsApprovedFalse(); // Переконайтеся, що запити дійсно є в базі
+        List<RoleRequest> requests = roleRequestRepository.findByIsApprovedFalseAndRejectedFalse();
 
         model.addAttribute("hotels", hotels);
         model.addAttribute("rooms", rooms);
@@ -171,9 +171,10 @@ public String approvedRequest(
     @PostMapping("/reject-request/{id}")
     public String rejectRequest(
             @PathVariable Long id,
+            @RequestParam(required = false) String comment, // Додано параметр
             RedirectAttributes redirectAttributes
     ) {
-        userService.rejectRequest(id);
+        userService.rejectRequest(id, comment); // Передаємо comment
         redirectAttributes.addFlashAttribute("success", "Запит відхилено");
         return "redirect:/admin";
     }

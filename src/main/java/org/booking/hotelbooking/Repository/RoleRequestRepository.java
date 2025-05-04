@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface RoleRequestRepository extends JpaRepository<RoleRequest, Long> {
     List<RoleRequest> findByIsApprovedFalse();
+    List<RoleRequest> findByIsApprovedFalseAndRejectedFalse();
 }

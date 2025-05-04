@@ -85,7 +85,7 @@ public class EmailService {
     /**
      * Надсилає лист про відхилення запиту на роль менеджера.
      */
-    public void sendRequestRejectedEmail(String toEmail, String hotelName) {
+    public void sendRequestRejectedEmail(String toEmail, String hotelName, String comment) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -93,7 +93,8 @@ public class EmailService {
             String htmlContent = "<div style='font-family: Arial, sans-serif; padding: 20px;'>"
                     + "<h2 style='color: #cc0000;'>Ваш запит на роль менеджера відхилено</h2>"
                     + "<p><strong>Готель:</strong> " + hotelName + "</p>"
-                    + "<p>Зв'яжіться з адміністратором для отримання додаткової інформації.</p>"
+                    + (comment != null ? "<p><strong>Коментар:</strong> " + comment + "</p>" : "")
+                    + "<p>Зв'яжіться з адміністратором для деталей.</p>"
                     + "</div>";
 
             helper.setTo(toEmail);
@@ -101,8 +102,8 @@ public class EmailService {
             helper.setText(htmlContent, true);
             mailSender.send(message);
         } catch (MessagingException e) {
-            logger.error("Помилка відправки листа на {}: {}", toEmail, e.getMessage());
-            throw new RuntimeException("Не вдалося надіслати лист", e);
+            logger.error("Помилка відправки листа: {}", e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

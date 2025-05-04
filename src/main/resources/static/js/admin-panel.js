@@ -19,6 +19,39 @@ function openEditHotelModal(button) {
     openModal('editHotelModal');
 }
 
+function openRejectModal(button) {
+    const requestId = button.getAttribute('data-request-id');
+    document.getElementById('rejectRequestId').value = requestId;
+    openModal('rejectCommentModal');
+}
+
+document.getElementById('rejectForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const requestId = document.getElementById('rejectRequestId').value;
+    const comment = document.getElementById('rejectComment').value.trim(); // Видаляємо пробіли
+
+    // Перевірка на пустий коментар
+    if (!comment) {
+        alert("Будь ласка, введіть причину відхилення!");
+        return; // Зупиняємо відправку
+    }
+
+    fetch(`/admin/reject-request/${requestId}?comment=${encodeURIComponent(comment)}`, {
+        method: 'POST'
+    })
+        .then(response => {
+            if (response.ok) {
+                closeModal(); // Закриваємо тільки після успішної відправки
+                window.location.reload();
+            } else {
+                alert('Помилка відхилення');
+            }
+        })
+        .catch(error => {
+            console.error('Помилка:', error);
+            alert('Помилка мережі');
+        });
+});
 function openEditRoomModal(button) {
     const room = {
         id: button.getAttribute('data-id'),

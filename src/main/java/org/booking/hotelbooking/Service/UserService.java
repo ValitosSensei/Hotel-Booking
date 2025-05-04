@@ -104,15 +104,16 @@ public class UserService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
-    public void rejectRequest(Long requestId) {
+    public void rejectRequest(Long requestId, String comment) {
         RoleRequest request = roleRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Запит не знайдено"));
-        roleRequestRepository.delete(request);
+        request.setRejected(true); // Позначити як відхилений
+        roleRequestRepository.save(request); // Оновити запис
 
-        // Відправка листа про відхилення
         emailService.sendRequestRejectedEmail(
                 request.getUser().getEmail(),
-                request.getHotelName()
+                request.getHotelName(),
+                comment
         );
     }
 }
