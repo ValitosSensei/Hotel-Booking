@@ -70,9 +70,15 @@
 - Панель адміністратора для CRUD-операцій над готелями, кімнатами, відгуками
 
 ---
-## Контакти
 
-Автор: Філаретов Максим
-Email: filaretovmaks@gmail.com
-Telegram: @time_to_doomer
+## Скріншоти
+
+
+
+---
+
+## Контакти
+- Автор: Філаретов Максим
+- Email: filaretovmaks@gmail.com
+- Telegram: @time_to_doomer
 
