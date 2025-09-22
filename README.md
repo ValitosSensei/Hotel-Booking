@@ -79,6 +79,12 @@
 ### Сторінка готелю
 ![Сторінка готелю](src/screenshots/hotelPage.png)
 
+### Адмін панель
+![Адмін панель](src/screenshots/adminDashboard.png)
+
+### Мененджер панель
+![Мененджер панель](src/screenshots/managerDashboard.png)
+
 ---
 
 ## Контакти
