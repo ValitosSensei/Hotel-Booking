@@ -93,5 +93,4 @@
 ## Контакти
 - Автор: Філаретов Максим
 - Email: filaretovmaks@gmail.com
-- Telegram: @time_to_doomer
 
