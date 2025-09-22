@@ -74,10 +74,10 @@
 ## Скріншоти
 
 ### Головна сторінка
-![Головна сторінка](screenshots/firstPage.png)
+![Головна сторінка](src/screenshots/firstPage.png)
 
 ### Сторінка готелю
-![Сторінка готелю](screenshots/hotelPage.png)
+![Сторінка готелю](src/screenshots/hotelPage.png)
 
 ---
 
