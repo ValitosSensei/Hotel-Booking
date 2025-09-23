@@ -54,7 +54,7 @@ public class HotelController {
 
     @GetMapping("/access-denied")
     public String handleAccessDenied() {
-        return "access-denied"; // Вказує на файл access-denied.html
+        return "access-denied"; 
     }
 
     @GetMapping("/")
@@ -70,7 +70,7 @@ public class HotelController {
             User user = userService.getUserByEmail(principal.getName());
             model.addAttribute("userRoles", user.getRoles());
         }
-        // Якщо вибрано "Усі міста", очищуємо фільтри
+        
         if (city == null || city.isEmpty()) {
             minRating = null;
             maxRating = null;
@@ -79,10 +79,8 @@ public class HotelController {
         // Отримуємо готелі, відсортовані за рейтингом та фільтруємо по рейтингу
         List<Hotel> hotels = hotelService.getHotelsByCityAndSortByRating(city, sortOrder, minRating, maxRating);
 
-        // Отримуємо список міст
         List<String> cities = hotelService.getAllCities();
 
-        // Додаємо атрибути в модель
         model.addAttribute("hotels", hotels);
         model.addAttribute("cities", cities);
         model.addAttribute("selectedCity", city);
