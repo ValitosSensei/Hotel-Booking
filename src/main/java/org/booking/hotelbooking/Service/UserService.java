@@ -74,8 +74,8 @@ public class UserService {
         request.setUser(user);
         request.setRequestRole(Role.ROLE_MANAGER);
         request.setRequestDate(LocalDateTime.now());
-        request.setHotelName(hotelName);       // Додано
-        request.setHotelAddress(hotelAddress); // Додано
+        request.setHotelName(hotelName);       
+        request.setHotelAddress(hotelAddress);
         roleRequestRepository.save(request);
     }
 
