@@ -65,7 +65,7 @@ public class AmadeusHotelService {
                 address = location[2];
             }
 
-            org.booking.hotelbooking.Entity.Hotel hotel = new org.booking.hotelbooking.Entity.Hotel();  // Використовуємо твою сутність готелю
+            org.booking.hotelbooking.Entity.Hotel hotel = new org.booking.hotelbooking.Entity.Hotel();  
             hotel.setName(name);
             hotel.setAddress(address);
             hotel.setCity(city);
@@ -76,10 +76,10 @@ public class AmadeusHotelService {
             hotel.setPhotoUrls(photos);
 
 
-            // Замініть блок генерації відгуків:
+           
             List<Review> reviews = new ArrayList<>();
 
-// Генеруємо лише один відгук на готель
+
             Review review = new Review();
             review.setRating(1 + random.nextInt(5)); // Випадковий рейтинг від 1 до 5
             review.setComment("Автоматичний відгук");
@@ -90,8 +90,8 @@ public class AmadeusHotelService {
 
             hotel.setReviews(reviews);
 
-            // Генерація більшої кількості кімнат
-            int roomCount = 5 + random.nextInt(6);  // Генеруємо від 5 до 10 кімнат
+            
+            int roomCount = 5 + random.nextInt(6); 
             for (int i = 0; i < roomCount; i++) {
                 Room room = new Room();
                 room.setRoomNumber("R" + (100 + random.nextInt(900)));
@@ -153,7 +153,7 @@ public class AmadeusHotelService {
     }
     private List<String> generateHotelPhotos(int count) {
         List<String> photos = new ArrayList<>();
-        String accessKey = "hygmPhoerF9qfIg5gpYrsjdG6pMnIOsNt1zzATI4-CM"; // Замініть на ваш ключ
+        String accessKey = "hygmPhoerF9qfIg5gpYrsjdG6pMnIOsNt1zzATI4-CM"; 
         try {
             String apiUrl = "https://api.unsplash.com/photos/random?query=hotel&count=" + count + "&client_id=" + accessKey;
             HttpRequest request = HttpRequest.newBuilder()
