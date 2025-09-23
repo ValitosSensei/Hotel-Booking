@@ -99,17 +99,14 @@
     </table>
 </div>
 
-<!-- Users tab (видалити дубльований блок) -->
 <div id="users" class="tab-content" style="display: none;">
     <div th:fragment="users">
         <h2>Manage Users</h2>
-
         <!-- Пошукова форма -->
         <form id="userSearchForm" class="user-search-form">
             <input type="email" id="searchEmail" name="email" placeholder="Search by email..." required>
             <button type="submit">Search</button>
         </form>
-
         <!-- Контейнер для результатів -->
         <div id="userResults">
             <table class="user-table">
@@ -163,7 +160,6 @@
             <td th:text="${request.user.email}"></td>
             <td th:text="${#temporals.format(request.requestDate, 'dd-MM-yyyy HH:mm')}"></td>
             <td>
-                <!-- Використання th:attr для передачі даних -->
                 <button class="btn-view"
                         th:attr="
                     data-hotel-name=${request.hotelName},
@@ -211,7 +207,6 @@
     <div id="syncResult"></div>
 </div>
 
-<!-- Додайте цей код після розділу "Synchronization tab" -->
 <div class="modal-overlay">
     <div id="requestDetailsModal" class="modal">
         <div class="modal-content">
