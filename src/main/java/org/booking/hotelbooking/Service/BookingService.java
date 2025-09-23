@@ -54,10 +54,7 @@ public class BookingService {
             throw new RuntimeException("Кімната не знайдена");
         }
 
-        // Замінити цей рядок:
-        // if (!roomService.isRoomAvailable(booking.getRoom().getId(), booking.getCheckInDate(), booking.getCheckOutDate())) {
-
-        // На цей:
+        
         if (!isRoomAvailable(booking.getRoom().getId(), booking.getCheckInDate(), booking.getCheckOutDate())) {
             throw new RuntimeException("Кімната вже зайнята на ці дати");
         }
