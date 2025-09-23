@@ -53,7 +53,7 @@ public class AdminController {
 
         model.addAttribute("hotels", hotels);
         model.addAttribute("rooms", rooms);
-        model.addAttribute("requests", requests); // Додано
+        model.addAttribute("requests", requests);
         model.addAttribute("searchedUsers", Collections.emptyList());
 
         return "adminPanel";
@@ -129,11 +129,8 @@ public String approvedRequest(
     userService.saveUser(user); // Зберегти оновлення
 
     userService.approveRequest(id);
-    // Отримати дані користувача та готелю
 
     String hotelName = request.getHotelName();
-
-    // Підтвердити запит
     userService.approveRequest(id);
 
     // Надіслати лист
@@ -171,10 +168,10 @@ public String approvedRequest(
     @PostMapping("/reject-request/{id}")
     public String rejectRequest(
             @PathVariable Long id,
-            @RequestParam(required = false) String comment, // Додано параметр
+            @RequestParam(required = false) String comment, 
             RedirectAttributes redirectAttributes
     ) {
-        userService.rejectRequest(id, comment); // Передаємо comment
+        userService.rejectRequest(id, comment); 
         redirectAttributes.addFlashAttribute("success", "Запит відхилено");
         return "redirect:/admin";
     }
